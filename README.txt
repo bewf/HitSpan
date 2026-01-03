@@ -1,59 +1,38 @@
--------------------------------------------
-Source installation information for modders
--------------------------------------------
-This code follows the Minecraft Forge installation methodology. It will apply
-some small patches to the vanilla MCP source code, giving you and it access 
-to some of the data and functions you need to build a successful mod.
+# HitSpan
 
-Note also that the patches are built against "unrenamed" MCP source code (aka
-srgnames) - this means that you will not be able to read them directly against
-normal code.
+HitSpan is a lightweight, client-side HUD mod for that displays:
 
-Source pack installation information:
+- **Hit range**, calculated using Minecraft’s own ray logic
+- **Knockback distance**, measured in real time after confirmed hits
 
-Standalone source installation
-==============================
+The goal of the mod is to stay simple and accurate.
 
-Step 1: Open your command-line and browse to the folder where you extracted the zip file.
+## Features
+- Accurate hit range calculation
+- Real knockback tracking over multiple ticks
+- Separate HUD boxes for range and knockback
+- Client-side only
+- Safe for multiplayer and modpacks
 
-Step 2: Once you have a command window up in the folder that the downloaded material was placed, type:
+## Current Status
+This is **v1.0**, and it is intentionally minimal.
 
-Windows: "gradlew setupDecompWorkspace"
-Linux/Mac OS: "./gradlew setupDecompWorkspace"
+There is currently **no configuration menu**.  
+HUD customization (position, scale, opacity, toggles) is planned for a future release.
 
-Step 3: After all that finished, you're left with a choice.
-For eclipse, run "gradlew eclipse" (./gradlew eclipse if you are on Mac/Linux)
+## Compatibility
+- Minecraft **1.8.9**
+- Forge **11.15.1.2318**
+- Client-side only
 
-If you preffer to use IntelliJ, steps are a little different.
-1. Open IDEA, and import project.
-2. Select your build.gradle file and have it import.
-3. Once it's finished you must close IntelliJ and run the following command:
+## Installation
+1. Install Minecraft Forge for 1.8.9
+2. Drop the HitSpan `.jar` into your `mods` folder
+3. Launch Minecraft
 
-"gradlew genIntellijRuns" (./gradlew genIntellijRuns if you are on Mac/Linux)
+## License
+**All Rights Reserved**
 
-Step 4: The final step is to open Eclipse and switch your workspace to /eclipse/ (if you use IDEA, it should automatically start on your project)
+You may include HitSpan in modpacks and redistribute it **unchanged**, with proper credit and a link to the original Modrinth or GitHub page.
 
-If at any point you are missing libraries in your IDE, or you've run into problems you can run "gradlew --refresh-dependencies" to refresh the local cache. "gradlew clean" to reset everything {this does not effect your code} and then start the processs again.
-
-Should it still not work, 
-Refer to #ForgeGradle on EsperNet for more information about the gradle environment.
-
-Tip:
-If you do not care about seeing Minecraft's source code you can replace "setupDecompWorkspace" with one of the following:
-"setupDevWorkspace": Will patch, deobfusicated, and gather required assets to run minecraft, but will not generated human readable source code.
-"setupCIWorkspace": Same as Dev but will not download any assets. This is useful in build servers as it is the fastest because it does the least work.
-
-Tip:
-When using Decomp workspace, the Minecraft source code is NOT added to your workspace in a editable way. Minecraft is treated like a normal Library. Sources are there for documentation and research purposes and usually can be accessed under the 'referenced libraries' section of your IDE.
-
-Forge source installation
-=========================
-MinecraftForge ships with this code and installs it as part of the forge
-installation process, no further action is required on your part.
-
-LexManos' Install Video
-=======================
-https://www.youtube.com/watch?v=8VEdtQLuLO0&feature=youtu.be
-
-For more details update more often refer to the Forge Forums:
-http://www.minecraftforge.net/forum/index.php/topic,14048.0.html
+Modification, reuploading, or redistribution of modified versions is not permitted.
