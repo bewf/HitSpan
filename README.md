@@ -1,4 +1,4 @@
-#HitSpan
+# HitSpan
 
 HitSpan is a lightweight, client-side HUD mod for that displays:
 
