@@ -15,10 +15,11 @@ The goal of the mod is to stay simple and accurate.
 - Safe for multiplayer and modpacks
 
 ## Current Status
-This is **v1.0**, and it is intentionally minimal.
+This is **v1.1**, and it is intentionally minimal.
 
-There is currently **no configuration menu**.  
-HUD customization (position, scale, opacity, toggles) is planned for a future release.
+There is now **a config menu**!  
+HUD customization (position, toggles) and General Customization (players only, hud decay/reset time.
+More config's are planned in the future, along with a better config menu.
 
 ## Compatibility
 - Minecraft **1.8.9**
