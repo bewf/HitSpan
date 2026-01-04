@@ -1,8 +1,10 @@
 package me.bewf.hitspan;
 
+import me.bewf.hitspan.config.HitSpanConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
@@ -14,11 +16,9 @@ public class RangeTracker {
 
     private final Minecraft mc = Minecraft.getMinecraft();
 
-    // Public values HUD reads
     public static double lastRange = -1;
     public static long lastRangeTimeMs = 0;
 
-    // Pending hit confirmation
     private int pendingEntityId = -1;
     private int pendingPrevHurtTime = 0;
     private int pendingTicksLeft = 0;
@@ -29,24 +29,21 @@ public class RangeTracker {
         if (mc.thePlayer == null || mc.theWorld == null) return;
         if (event.target == null) return;
 
-        // Only care about living targets (players/mobs)
-        if (!(event.target instanceof EntityLivingBase)) return;
+        // playersOnly toggle
+        if (HitSpanConfig.playersOnly && !(event.target instanceof EntityPlayer)) return;
 
+        if (!(event.target instanceof EntityLivingBase)) return;
         EntityLivingBase target = (EntityLivingBase) event.target;
 
         double maxReach = mc.thePlayer.capabilities.isCreativeMode ? 4.5D : 3.0D;
-
         double computed = computeEntityRayDistance(mc.thePlayer, target, 1.0F, maxReach);
 
-        // If we can't compute, don't update anything
         if (computed < 0) return;
-
-        // Clamp to the same max reach used by the ray
         if (computed > maxReach) computed = maxReach;
 
         pendingEntityId = target.getEntityId();
         pendingPrevHurtTime = target.hurtTime;
-        pendingTicksLeft = 3; // wait up to 3 client ticks to confirm actual damage
+        pendingTicksLeft = 3;
         pendingRange = computed;
     }
 
@@ -62,22 +59,18 @@ public class RangeTracker {
             if (e instanceof EntityLivingBase) {
                 EntityLivingBase target = (EntityLivingBase) e;
 
-                // Confirm real hit: hurtTime increased (damage animation triggered)
                 if (target.hurtTime > pendingPrevHurtTime) {
                     lastRange = pendingRange;
                     lastRangeTimeMs = System.currentTimeMillis();
 
-                    // Start KB tracking off this confirmed hit
                     KnockbackTracker.beginTracking(target);
 
-                    // Clear pending
                     pendingEntityId = -1;
                     pendingTicksLeft = 0;
                     pendingRange = -1;
                 }
             }
 
-            // If timed out, clear pending (prevents updates on spam clicks)
             if (pendingTicksLeft == 0) {
                 pendingEntityId = -1;
                 pendingRange = -1;
@@ -85,7 +78,6 @@ public class RangeTracker {
         }
     }
 
-    // Ray from player eyes along look vector, intersect target AABB like MC does.
     private static double computeEntityRayDistance(EntityLivingBase player, Entity target, float partialTicks, double maxDist) {
         Vec3 eyes = player.getPositionEyes(partialTicks);
         Vec3 look = player.getLook(partialTicks);
