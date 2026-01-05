@@ -7,6 +7,8 @@ HitSpan is a lightweight, client-side HUD mod for Minecraft 1.8.9 that displays:
 
 The goal of the mod is to stay simple, accurate, and multiplayer-safe.
 
+![HitSpan HUD Example](ExamplePicHitSpan.png)
+
 ## Features
 - Accurate hit range calculation
 - Real knockback tracking over several ticks
