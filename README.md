@@ -16,7 +16,7 @@ The goal of the mod is to stay simple, accurate, and multiplayer-safe.
 - Safe for multiplayer and modpacks
 
 ## Current Status
-This is **v1.1**, and it is intentionally minimal.
+This is **v1.2**, and it is intentionally minimal.
 
 A configuration menu is available via **OneConfig**, allowing:
 - HUD positioning and visibility
