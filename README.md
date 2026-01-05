@@ -1,16 +1,43 @@
-# OneConfigExampleMod
+# HitSpan
 
-![Powered by OneConfig](https://polyfrost.org/media/branding/badges/badge_1.svg)
-![Compact Powered by OneConfig](https://polyfrost.org/media/branding/badges/badge_2.svg)
-![Minimal Powered by OneConfig](https://polyfrost.org/media/branding/badges/badge_3.svg)
-![Minimal Compact Powered by OneConfig](https://polyfrost.org/media/branding/badges/badge_4.svg)
+HitSpan is a lightweight, client-side HUD mod for Minecraft 1.8.9 that displays:
 
-Example mod implementing OneConfig.
+- **Hit range**, calculated using Minecraft’s own ray + hitbox logic
+- **Knockback distance**, measured over multiple ticks after a confirmed hit
 
-## How to use
+The goal of the mod is to stay simple, accurate, and multiplayer-safe.
 
-- Copy the template either by using GitHub's "Use this template" feature or downloading the repo manually.
-- **Remove the license named "LICENSE-TEMPLATE" and choose a new one.**
-- Refactor the template (specifically, the modid, version and name in the gradle.properties and most of the class names)
-  to a different name.
-- Have fun modding! :D
+## Features
+- Accurate hit range calculation
+- Real knockback tracking over several ticks
+- Separate HUD elements for range and knockback
+- Draggable HUDs via OneConfig
+- Fully client-side
+- Safe for multiplayer and modpacks
+
+## Current Status
+This is **v1.1**, and it is intentionally minimal.
+
+A configuration menu is available via **OneConfig**, allowing:
+- HUD positioning and visibility
+- HUD decay/reset timing
+- Players-only mode
+
+More configuration options may be added in the future.
+
+## Compatibility
+- Minecraft **1.8.9**
+- Forge **11.15.1.2318**
+- Client-side only
+
+## Installation
+1. Install Minecraft Forge for 1.8.9
+2. Place the HitSpan `.jar` into your `mods` folder
+3. Launch Minecraft
+
+## License
+**All Rights Reserved**
+
+You may include HitSpan in modpacks and redistribute it **unchanged**, provided proper credit is given and a link to the original Modrinth or GitHub page is included.
+
+Modified versions, forks, or redistribution of altered copies are not permitted.
