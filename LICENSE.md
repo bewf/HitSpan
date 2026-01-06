@@ -1,9 +1,8 @@
-<<<<<<< HEAD
-\# License
+# License
 
 
 
-\## HitSpan – All Rights Reserved
+## HitSpan – All Rights Reserved
 
 
 
@@ -11,15 +10,15 @@ Copyright (c) 2026 bewf
 
 
 
-HitSpan is released under \*\*All Rights Reserved\*\*.
+HitSpan is released under **All Rights Reserved**.
 
 
 
-You are allowed to include this mod in modpacks and redistribute it \*\*unchanged\*\*, provided that proper credit is given and a link to the original Modrinth or GitHub page is included.
+You are allowed to include this mod in modpacks and redistribute it **unchanged**, provided that proper credit is given and a link to the original Modrinth or GitHub page is included.
 
 
 
-Modified versions, reuploads, forks, or redistribution of altered copies are \*\*not permitted\*\* without explicit permission from the author.
+Modified versions, reuploads, forks, or redistribution of altered copies are **not permitted** without explicit permission from the author.
 
 
 
@@ -30,20 +29,3 @@ Third-party libraries and dependencies retain their own respective licenses.
 
 
 
-
-=======
-# License
-
-## HitSpan – All Rights Reserved
-
-Copyright (c) 2026 bewf
-
-HitSpan is released under **All Rights Reserved**.
-
-You are allowed to include this mod in modpacks and redistribute it **unchanged**, provided that proper credit is given and a link to the original Modrinth or GitHub page is included.
-
-Modified versions, reuploads, forks, or redistribution of altered copies are **not permitted** without explicit permission from the author.
-
-This license applies only to HitSpan’s source code and assets.
-Third-party libraries and dependencies retain their own respective licenses.
->>>>>>> 5498e43c61bfb73aa950a223cced809b09c3484e
