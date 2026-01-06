@@ -19,8 +19,13 @@ public class RangeTracker {
     public static double lastRange = -1;
     public static long lastRangeTimeMs = 0;
 
+    // Used by the mixin to confirm hits
+    public static RangeTracker INSTANCE;
+    public RangeTracker() { INSTANCE = this; }
+
     private int pendingEntityId = -1;
     private int pendingPrevHurtTime = 0;
+    private int pendingPrevHurtResistantTime = 0;
     private int pendingTicksLeft = 0;
     private double pendingRange = -1;
 
@@ -30,20 +35,25 @@ public class RangeTracker {
         if (event.target == null) return;
 
         // playersOnly toggle
-        if (HitSpanConfig.playersOnly && !(event.target instanceof EntityPlayer)) return;
+        if (HitSpanConfig.INSTANCE != null && HitSpanConfig.INSTANCE.playersOnly) {
+            if (!(event.target instanceof EntityPlayer)) return;
+        }
 
         if (!(event.target instanceof EntityLivingBase)) return;
         EntityLivingBase target = (EntityLivingBase) event.target;
 
         double maxReach = mc.thePlayer.capabilities.isCreativeMode ? 4.5D : 3.0D;
         double computed = computeEntityRayDistance(mc.thePlayer, target, 1.0F, maxReach);
-
         if (computed < 0) return;
         if (computed > maxReach) computed = maxReach;
 
         pendingEntityId = target.getEntityId();
         pendingPrevHurtTime = target.hurtTime;
-        pendingTicksLeft = 3;
+        pendingPrevHurtResistantTime = target.hurtResistantTime;
+
+        // give it longer to confirm, since hurtTime can be weird/late with ping/mods
+        pendingTicksLeft = 10;
+
         pendingRange = computed;
     }
 
@@ -59,23 +69,53 @@ public class RangeTracker {
             if (e instanceof EntityLivingBase) {
                 EntityLivingBase target = (EntityLivingBase) e;
 
-                if (target.hurtTime > pendingPrevHurtTime) {
-                    lastRange = pendingRange;
-                    lastRangeTimeMs = System.currentTimeMillis();
+                boolean hurtTimeIncreased = target.hurtTime > pendingPrevHurtTime;
+                boolean resistantIncreased = target.hurtResistantTime > pendingPrevHurtResistantTime;
 
-                    KnockbackTracker.beginTracking(target);
-
-                    pendingEntityId = -1;
-                    pendingTicksLeft = 0;
-                    pendingRange = -1;
+                if (hurtTimeIncreased || resistantIncreased) {
+                    confirmHit(target);
+                    return;
                 }
             }
 
             if (pendingTicksLeft == 0) {
-                pendingEntityId = -1;
-                pendingRange = -1;
+                clearPending();
             }
         }
+    }
+
+    // Called by mixin when we receive the server "hurt animation" packet
+    public void confirmFromHurtPacket(int entityId) {
+        if (pendingEntityId == -1) return;
+        if (entityId != pendingEntityId) return;
+        if (pendingTicksLeft <= 0) return;
+
+        Entity e = mc.theWorld.getEntityByID(pendingEntityId);
+        if (e instanceof EntityLivingBase) {
+            confirmHit((EntityLivingBase) e);
+        } else {
+            // still confirm range even if we can't resolve entity
+            lastRange = pendingRange;
+            lastRangeTimeMs = System.currentTimeMillis();
+            clearPending();
+        }
+    }
+
+    private void confirmHit(EntityLivingBase target) {
+        lastRange = pendingRange;
+        lastRangeTimeMs = System.currentTimeMillis();
+
+        KnockbackTracker.beginTracking(target);
+
+        clearPending();
+    }
+
+    private void clearPending() {
+        pendingEntityId = -1;
+        pendingTicksLeft = 0;
+        pendingRange = -1;
+        pendingPrevHurtTime = 0;
+        pendingPrevHurtResistantTime = 0;
     }
 
     private static double computeEntityRayDistance(EntityLivingBase player, Entity target, float partialTicks, double maxDist) {

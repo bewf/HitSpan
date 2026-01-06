@@ -1,94 +1,64 @@
 package me.bewf.hitspan.config;
 
-import net.minecraftforge.common.config.Configuration;
+import cc.polyfrost.oneconfig.config.Config;
+import cc.polyfrost.oneconfig.config.annotations.Checkbox;
+import cc.polyfrost.oneconfig.config.annotations.Color;
+import cc.polyfrost.oneconfig.config.annotations.HUD;
+import cc.polyfrost.oneconfig.config.annotations.Number;
+import cc.polyfrost.oneconfig.config.core.OneColor;
+import cc.polyfrost.oneconfig.config.data.Mod;
+import cc.polyfrost.oneconfig.config.data.ModType;
+import me.bewf.hitspan.hud.KnockbackHud;
+import me.bewf.hitspan.hud.RangeHud;
 
-import java.io.File;
+public class HitSpanConfig extends Config {
+    public static HitSpanConfig INSTANCE;
 
-public class HitSpanConfig {
+    @Number(name = "Decay Time (ms)", description = "How long before values reset or the HUD hides", min = 0.0F, max = 10000.0F, category = "General")
+    public int decayTimeMs = 2000;
 
-    private static Configuration configFile;
+    @Checkbox(name = "Hide on Decay", description = "Hide the HUD when decayed (otherwise it shows 0.00)", category = "General")
+    public boolean hideOnDecay = false;
 
-    public static int decayMs = 2000;
-    public static boolean playersOnly = true;
+    @Checkbox(name = "Players Only", description = "Only track hits on players", category = "General")
+    public boolean playersOnly = true;
 
-    public static boolean showRangeHud = true;
-    public static boolean showKbHud = true;
+    @Checkbox(name = "Dynamic Range", description = "Change the range text color based on distance", category = "Range")
+    public boolean dynamicRange = true;
 
-    public static int rangeX = 5, rangeY = 5;
-    public static int kbX = 5, kbY = 22;
+    @Number(name = "Green Range Minimum", description = "Green if range >= this", min = 0.0F, max = 10.0F, category = "Range")
+    public float rangeGreenMin = 2.7F;
 
-    public static void init(File file) {
-        configFile = new Configuration(file);
-        sync(); // loads, reads values, saves if needed
+    @Number(name = "Yellow Range Minimum", description = "Yellow if range >= this", min = 0.0F, max = 10.0F, category = "Range")
+    public float rangeYellowMin = 1.5F;
+
+    @Color(name = "Green Color", description = "Color for good range", category = "Range")
+    public OneColor rangeGreenColor = new OneColor(-11141291);
+
+    @Color(name = "Yellow Color", description = "Color for medium range", category = "Range")
+    public OneColor rangeYellowColor = new OneColor(-171);
+
+    @Color(name = "Red Color", description = "Color for bad range", category = "Range")
+    public OneColor rangeRedColor = new OneColor(-43691);
+
+    @HUD(name = "Range HUD", category = "HUD")
+    public final RangeHud rangeHud = new RangeHud();
+
+    @HUD(name = "Knockback HUD", category = "HUD")
+    public final KnockbackHud knockbackHud = new KnockbackHud();
+
+    private HitSpanConfig() {
+        super(new Mod("HitSpan", ModType.UTIL_QOL), "hitspan.json");
+        initialize();
     }
 
-    public static void sync() {
-        if (configFile == null) return;
-
-        try {
-            configFile.load();
-
-            decayMs = configFile.getInt(
-                    "decayMs",
-                    "general",
-                    decayMs,
-                    0,
-                    600000,
-                    "How long until HUD values reset to 0 (milliseconds)"
-            );
-
-            playersOnly = configFile.getBoolean(
-                    "playersOnly",
-                    "general",
-                    playersOnly,
-                    "Only track hits against players"
-            );
-
-            showRangeHud = configFile.getBoolean(
-                    "showRangeHud",
-                    "hud",
-                    showRangeHud,
-                    "Show the Range HUD"
-            );
-
-            showKbHud = configFile.getBoolean(
-                    "showKbHud",
-                    "hud",
-                    showKbHud,
-                    "Show the KB HUD"
-            );
-
-            rangeX = configFile.getInt("rangeX", "hud", rangeX, 0, 10000, "Range HUD X position");
-            rangeY = configFile.getInt("rangeY", "hud", rangeY, 0, 10000, "Range HUD Y position");
-
-            kbX = configFile.getInt("kbX", "hud", kbX, 0, 10000, "KB HUD X position");
-            kbY = configFile.getInt("kbY", "hud", kbY, 0, 10000, "KB HUD Y position");
-
-        } finally {
-            if (configFile.hasChanged()) configFile.save();
-        }
+    public static void init() {
+        if (INSTANCE == null)
+            INSTANCE = new HitSpanConfig();
     }
 
-    public static Configuration getConfig() {
-        return configFile;
-    }
-
-    // called when GUI changes, just re-read from the config object + save
-    public static void saveAndSyncFromGui() {
-        if (configFile == null) return;
-        // don't call load() here, GUI already edited configFile in memory
-        // just re-read values out of it:
-        decayMs = configFile.get("general", "decayMs", decayMs).getInt();
-        playersOnly = configFile.get("general", "playersOnly", playersOnly).getBoolean();
-
-        showRangeHud = configFile.get("hud", "showRangeHud", showRangeHud).getBoolean();
-        showKbHud = configFile.get("hud", "showKbHud", showKbHud).getBoolean();
-
-        rangeX = configFile.get("hud", "rangeX", rangeX).getInt();
-        rangeY = configFile.get("hud", "rangeY", rangeY).getInt();
-        kbX = configFile.get("hud", "kbX", kbX).getInt();
-        kbY = configFile.get("hud", "kbY", kbY).getInt();
-
-        if (configFile.hasChanged()) configFile.save();
+    public static void saveConfig() {
+        if (INSTANCE != null)
+            INSTANCE.save();
     }
 }
