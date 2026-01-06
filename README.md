@@ -1,45 +1,55 @@
 # HitSpan
 
-HitSpan is a lightweight, client-side HUD mod for Minecraft 1.8.9 that displays:
+**HitSpan** is a lightweight, client-side HUD mod for Minecraft that provides accurate, real-time combat feedback. It displays your **hit range (reach)** using Minecraft’s own ray and hitbox logic, along with **knockback distance** measured over several ticks after a confirmed hit.
 
-- **Hit range**, calculated using Minecraft’s own ray + hitbox logic
-- **Knockback distance**, measured over multiple ticks after a confirmed hit
+The goal of HitSpan is to stay **simple, accurate, and multiplayer-safe**. I made this mod because I couldn't find a good alternative for 1.8.9.
 
-The goal of the mod is to stay simple, and accurate.
 
-![HitSpan HUD Example](ExamplePicHitSpan.png)
+## Features (In Depth)
 
-## Features
-- Accurate hit range calculation
-- Real knockback tracking over several ticks
-- Separate HUD elements for range and knockback
-- Draggable HUDs via OneConfig
-- Fully client-side
-- Safe for multiplayer and modpacks
+* **Accurate hit range calculation**:
 
-## Current Status
-This is **v1.2**, and it is intentionally minimal.
+  HitSpan measures distance using Minecraft’s built-in ray tracing from the player’s eye position to the target’s hitbox. This makes sure that results closely match how the game itself determines hits, rather than using approximations or entity distances.
+---
+* **Dynamic range color feedback (optional)**:
 
-A configuration menu is available via **OneConfig**, allowing:
-- HUD positioning and visibility
-- HUD decay/reset timing
-- Players-only mode
+  The range display can change color based on how far the hit was, this feature can help you maintain proper distancing without having to look at the number:
 
-More configuration options may be added in the future.
+  * **Green** for long-range hits (default: ≥ 2.7 blocks)
+  * **Yellow** for mid-range hits (default: ≥ 1.5 blocks)
+  * **Red** for close-range hits
+    All thresholds and colors are fully configurable.
+---
+* **Knockback tracking over multiple ticks**:
 
-## Compatibility
-- Minecraft **1.8.9**
-- Forge **11.15.1.2318**
-- Client-side only
+  Knockback is calculated by tracking the target’s horizontal displacement over several ticks after a confirmed hit, recording the maximum movement to give a more accurate representation of knockback strength.
 
-## Installation
-1. Install Minecraft Forge for 1.8.9
-2. Place the HitSpan `.jar` into your `mods` folder
-3. Launch Minecraft
+---
+* **OneConfig-powered HUD system**:
 
-## License
-**All Rights Reserved**
+  Both the range and knockback displays use OneConfig's HUD framework, allowing:
 
-You may include HitSpan in modpacks and redistribute it **unchanged**, provided proper credit is given and a link to the original Modrinth or GitHub page is included.
+  * Dragging and repositioning
+  * Scaling
+  * Toggling visibility
+  * Clean integration with the OneConfig HUD editor
+---
+* **Fully client-side & multiplayer-safe**:
 
-Modified versions, forks, or redistribution of altered copies are not permitted.
+  HitSpan does not send packets, modify reach, or interact with the servers in any way. It only observes client-side data and server responses already visible to the player. This makes it fully safe for server use.
+---
+
+![Example of HUD (Customizable)](https://cdn.modrinth.com/data/cached_images/61c1c0fafd6fc225cb29c0d5c684d2fe0ab212f5.png)
+> Example of HUD, my personal customization.
+
+## What's New (v1.2.0)
+
+* Migrated HUD rendering to the **OneConfig** HUD system
+* Full HUD editor support (drag, scale, toggle)
+* Improved hit detection reliability
+* Dynamic range coloring with configurable thresholds
+* Removed legacy HUD code and cleaned up internal logic
+* bewf on top (secret)
+
+---
+##### Code licensed under [ARR](https://github.com/bewf/HitSpan/blob/main/LICENSE.md). Unmodified redistribution is permitted with credit. See the [full license](https://github.com/bewf/HitSpan/blob/main/LICENSE.md) for details.
