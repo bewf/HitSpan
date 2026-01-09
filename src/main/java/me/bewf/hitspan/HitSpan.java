@@ -20,7 +20,11 @@ public class HitSpan {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        HitSpanConfig.init();
+        try {
+            HitSpanConfig.init();
+        } catch (Throwable t) {
+            System.err.println("HitSpanConfig failed to initialize; continuing without config: " + t);
+        }
     }
 
     @Mod.EventHandler

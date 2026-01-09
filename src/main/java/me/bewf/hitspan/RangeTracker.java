@@ -27,19 +27,16 @@ public class RangeTracker {
     private int pendingPrevHurtTime = 0;
     private int pendingPrevHurtResistantTime = 0;
     private int pendingTicksLeft = 0;
-    private double pendingRange = -1;
 
     @SubscribeEvent
     public void onAttack(AttackEntityEvent event) {
         if (mc.thePlayer == null || mc.theWorld == null) return;
         if (event.target == null) return;
 
-        // playersOnly toggle
-        if (HitSpanConfig.INSTANCE != null && HitSpanConfig.INSTANCE.playersOnly) {
-            if (!(event.target instanceof EntityPlayer)) return;
-        }
-
+        HitSpanConfig cfg = HitSpanConfig.INSTANCE;
+        if (cfg != null && cfg.playersOnly && !(event.target instanceof EntityPlayer)) return;
         if (!(event.target instanceof EntityLivingBase)) return;
+
         EntityLivingBase target = (EntityLivingBase) event.target;
 
         double maxReach = mc.thePlayer.capabilities.isCreativeMode ? 4.5D : 3.0D;
@@ -47,14 +44,15 @@ public class RangeTracker {
         if (computed < 0) return;
         if (computed > maxReach) computed = maxReach;
 
+        // ✅ ALWAYS update range immediately (even if server later rejects)
+        lastRange = computed;
+        lastRangeTimeMs = System.currentTimeMillis();
+
+        // Pending confirmation (ONLY used to start KB tracking)
         pendingEntityId = target.getEntityId();
         pendingPrevHurtTime = target.hurtTime;
         pendingPrevHurtResistantTime = target.hurtResistantTime;
-
-        // give it longer to confirm, since hurtTime can be weird/late with ping/mods
         pendingTicksLeft = 10;
-
-        pendingRange = computed;
     }
 
     @SubscribeEvent
@@ -73,7 +71,9 @@ public class RangeTracker {
                 boolean resistantIncreased = target.hurtResistantTime > pendingPrevHurtResistantTime;
 
                 if (hurtTimeIncreased || resistantIncreased) {
-                    confirmHit(target);
+                    // ✅ Confirmed hit: start KB tracking
+                    KnockbackTracker.beginTracking(target);
+                    clearPending();
                     return;
                 }
             }
@@ -84,36 +84,24 @@ public class RangeTracker {
         }
     }
 
-    // Called by mixin when we receive the server "hurt animation" packet
+    // Called by mixin when we receive the server "hurt animation" packet (opcode 2)
     public void confirmFromHurtPacket(int entityId) {
         if (pendingEntityId == -1) return;
         if (entityId != pendingEntityId) return;
         if (pendingTicksLeft <= 0) return;
+        if (mc.theWorld == null) return;
 
         Entity e = mc.theWorld.getEntityByID(pendingEntityId);
         if (e instanceof EntityLivingBase) {
-            confirmHit((EntityLivingBase) e);
-        } else {
-            // still confirm range even if we can't resolve entity
-            lastRange = pendingRange;
-            lastRangeTimeMs = System.currentTimeMillis();
-            clearPending();
+            // ✅ Confirmed hit: start KB tracking
+            KnockbackTracker.beginTracking((EntityLivingBase) e);
         }
-    }
-
-    private void confirmHit(EntityLivingBase target) {
-        lastRange = pendingRange;
-        lastRangeTimeMs = System.currentTimeMillis();
-
-        KnockbackTracker.beginTracking(target);
-
         clearPending();
     }
 
     private void clearPending() {
         pendingEntityId = -1;
         pendingTicksLeft = 0;
-        pendingRange = -1;
         pendingPrevHurtTime = 0;
         pendingPrevHurtResistantTime = 0;
     }

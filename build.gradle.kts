@@ -52,8 +52,12 @@ repositories {
 
 dependencies {
     // Compile against the same OneConfig line your installed OneConfig mods use.
-    // This prevents missing classes like org/polyfrost/oneconfig/api/config/v1/Node.
     modCompileOnly("cc.polyfrost:oneconfig-1.8.9-forge:0.2.2-alpha+")
+    // This prevents missing classes like org/polyfrost/oneconfig/api/config/v1/Node.
+    // Make OneConfig available at runtime when running from Gradle so the mod can load.
+    modRuntimeOnly("cc.polyfrost:oneconfig-1.8.9-forge:0.2.2-alpha+")
+    // Provide the launchwrapper wrapper/artifact which contains internal runtime classes
+    modRuntimeOnly("cc.polyfrost:oneconfig-wrapper-launchwrapper:1.0.0-beta17")
 }
 
 // Use Java 8 for BOTH compiling and running (Forge 1.8.9 requirement).
