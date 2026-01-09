@@ -1,4 +1,7 @@
-![HitSpan](https://github.com/bewf/HitSpan/blob/main/GitAssets/icon4.png)
+<p align="center">
+  <img src="https://github.com/bewf/HitSpan/raw/main/GitAssets/icon4.png" width="400">
+</p>
+
 
 **HitSpan** is a lightweight, client-side HUD mod for Minecraft that provides accurate, real-time combat feedback. It displays your **hit range (reach)** using Minecraft’s own ray and hitbox logic, along with **knockback distance** measured over several ticks after a confirmed hit.
 
