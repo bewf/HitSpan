@@ -9,7 +9,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 @Mod(
         modid = HitSpan.MODID,
         name = "HitSpan",
-        version = "1.2.1",
+        version = "1.2.2",
         acceptedMinecraftVersions = "[1.8.9]",
         clientSideOnly = true,
         acceptableRemoteVersions = "*"

@@ -100,13 +100,24 @@ public class HitSpanConfig extends Config {
     public final KnockbackHud knockbackHud = new KnockbackHud();
 
     private HitSpanConfig() {
-        super(new Mod("HitSpan", ModType.UTIL_QOL), "hitspan.json");
+        super(
+                new Mod(
+                        "HitSpan",
+                        ModType.UTIL_QOL,
+                        "/assets/hitspan/icon3.png" // transparent OneConfig icon
+                ),
+                "hitspan.json"
+        );
+
         try {
             initialize();
         } catch (NoClassDefFoundError e) {
-            System.err.println("OneConfig internal classes not found; skipping config initialization: " + e.getMessage());
+            System.err.println(
+                    "OneConfig internal classes not found; skipping config initialization: " + e.getMessage()
+            );
         }
     }
+
 
     public static void init() {
         if (INSTANCE == null) {

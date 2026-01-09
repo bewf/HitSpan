@@ -44,7 +44,7 @@ If you have any problems or suggestions feel free to open an **issue**. I will t
 ![Example of HUD (Customizable)](https://cdn.modrinth.com/data/cached_images/61c1c0fafd6fc225cb29c0d5c684d2fe0ab212f5.png)
 > Example of HUD, my personal customization.
 
-## What's New (v1.2.1)
+## What's New (v1.2.2)
 
 * Migrated HUD rendering to the **OneConfig** HUD system
 * Full HUD editor support (drag, scale, toggle)
