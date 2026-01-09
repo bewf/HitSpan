@@ -3,7 +3,7 @@
     "modid": "hitspan",
     "name": "HitSpan",
     "description": "Range + knockback HUD",
-    "version": "1.2",
+    "version": "1.2.1",
     "mcversion": "1.8.9",
     "authorList": ["bewf"]
   }

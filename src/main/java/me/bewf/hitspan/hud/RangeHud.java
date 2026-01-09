@@ -8,7 +8,7 @@ import java.text.DecimalFormat;
 
 public class RangeHud extends SingleTextHud {
 
-    private static final DecimalFormat DF = new DecimalFormat("0.00");
+    private static final transient DecimalFormat DF = new DecimalFormat("0.00");
 
     public RangeHud() {
         super("Range", true); // this becomes the left label in the HUD

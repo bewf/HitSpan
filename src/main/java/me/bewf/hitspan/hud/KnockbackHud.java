@@ -8,7 +8,7 @@ import java.text.DecimalFormat;
 
 public class KnockbackHud extends SingleTextHud {
 
-    private static final DecimalFormat DF = new DecimalFormat("0.00");
+    private static final transient DecimalFormat DF = new DecimalFormat("0.00");
 
     public KnockbackHud() {
         super("KB", true); // label shown on the left

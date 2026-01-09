@@ -9,7 +9,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 @Mod(
         modid = HitSpan.MODID,
         name = "HitSpan",
-        version = "1.2",
+        version = "1.2.1",
         acceptedMinecraftVersions = "[1.8.9]",
         clientSideOnly = true,
         acceptableRemoteVersions = "*"
@@ -22,6 +22,14 @@ public class HitSpan {
     public void preInit(FMLPreInitializationEvent event) {
         try {
             HitSpanConfig.init();
+
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                try {
+                    HitSpanConfig.saveConfig();
+                } catch (Throwable t) {
+                    System.err.println("HitSpanConfig failed to save on shutdown: " + t);
+                }
+            }, "HitSpan-ConfigSave"));
         } catch (Throwable t) {
             System.err.println("HitSpanConfig failed to initialize; continuing without config: " + t);
         }

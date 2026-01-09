@@ -42,13 +42,15 @@ The goal of HitSpan is to stay **simple, accurate, and multiplayer-safe**. I mad
 ![Example of HUD (Customizable)](https://cdn.modrinth.com/data/cached_images/61c1c0fafd6fc225cb29c0d5c684d2fe0ab212f5.png)
 > Example of HUD, my personal customization.
 
-## What's New (v1.2.0)
+## What's New (v1.2.1)
 
 * Migrated HUD rendering to the **OneConfig** HUD system
 * Full HUD editor support (drag, scale, toggle)
 * Improved hit detection reliability
 * Dynamic range coloring with configurable thresholds
 * Removed legacy HUD code and cleaned up internal logic
+* Fixed One-Config Embed issue
+* Fixed One-Config HUD not persisting issue
 * bewf on top (secret)
 
 ---
