@@ -4,14 +4,13 @@
 
 The goal of HitSpan is to stay **simple, accurate, and multiplayer-safe**. I made this mod because I couldn't find a good alternative for 1.8.9.
 
+If you have any problems or suggestions feel free to open an **issue**. I will try my best to resolve any problems. 
 
 ## Features (In Depth)
 
 * **Accurate hit range calculation**:
 
   HitSpan measures distance using Minecraft’s built-in ray tracing from the player’s eye position to the target’s hitbox. This makes sure that results closely match how the game itself determines hits, rather than using approximations or entity distances.
-
-If you have any problems or suggestions feel free to open an **issue**. I will try my best to resolve any problems. 
 
 ---
 * **Dynamic range color feedback (optional)**:
