@@ -44,15 +44,13 @@ If you have any problems or suggestions feel free to open an **issue**. I will t
 ![Example of HUD](https://github.com/bewf/HitSpan/blob/main/GitAssets/ExamplePicHitSpan.png)
 > Example of HUD, my personal customization.
 
-## What's New (v1.2.2)
+## What's New (v1.2.x)
 
 * Migrated HUD rendering to the **OneConfig** HUD system
 * Full HUD editor support (drag, scale, toggle)
 * Improved hit detection reliability
 * Dynamic range coloring with configurable thresholds
 * Removed legacy HUD code and cleaned up internal logic
-* Fixed One-Config Embed issue
-* Fixed One-Config HUD not persisting issue
 * bewf on top (secret)
 
 ---
