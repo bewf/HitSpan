@@ -5,7 +5,7 @@
 
 **HitSpan** is a lightweight, client-side HUD mod for Minecraft that provides accurate, real-time combat feedback. It displays your **hit range (reach)** using Minecraft’s own ray and hitbox logic, along with **knockback distance** measured over several ticks after a confirmed hit.
 
-The goal of HitSpan is to stay **simple, accurate, and multiplayer-safe**. I made this mod because I couldn't find a good alternative for 1.8.9.
+The goal of HitSpan is to stay **simple, accurate, and highly customizable**. I made this mod because I couldn't find a good alternative for 1.8.9.
 
 If you have any problems or suggestions feel free to open an **issue**. I will try my best to resolve any problems. 
 
