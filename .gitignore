@@ -1,7 +1,6 @@
 /build/
 /.gradle/
 /run/
-*.jar
 *.iml
 .idea/
 src/.idea/
