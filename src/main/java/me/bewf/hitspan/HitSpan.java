@@ -9,7 +9,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 @Mod(
         modid = HitSpan.MODID,
         name = "HitSpan",
-        version = "1.2.2",
+        version = "1.2.3",
         acceptedMinecraftVersions = "[1.8.9]",
         clientSideOnly = true,
         acceptableRemoteVersions = "*"
@@ -22,7 +22,6 @@ public class HitSpan {
     public void preInit(FMLPreInitializationEvent event) {
         try {
             HitSpanConfig.init();
-
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {
                     HitSpanConfig.saveConfig();
@@ -37,10 +36,8 @@ public class HitSpan {
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
-        // Register event listeners
         MinecraftForge.EVENT_BUS.register(new RangeTracker());
         MinecraftForge.EVENT_BUS.register(new KnockbackTracker());
-
         System.out.println("HitSpan loaded - bewf on top");
     }
 }

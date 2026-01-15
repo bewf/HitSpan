@@ -11,7 +11,7 @@ public class RangeHud extends SingleTextHud {
     private static final transient DecimalFormat DF = new DecimalFormat("0.00");
 
     public RangeHud() {
-        super("Range", true); // this becomes the left label in the HUD
+        super("Range", true);
     }
 
     @Override
@@ -33,7 +33,6 @@ public class RangeHud extends SingleTextHud {
         if (now - RangeTracker.lastRangeTimeMs > cfg.decayTimeMs) val = 0.0;
         if (val < 0.0) val = 0.0;
 
-        // If you want dynamic color IN the text itself, use § codes here.
         if (cfg.dynamicRange && val > 0) {
             if (val >= cfg.rangeGreenMin) return "§a" + DF.format(val);
             if (val >= cfg.rangeYellowMin) return "§e" + DF.format(val);

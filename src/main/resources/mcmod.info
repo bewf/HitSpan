@@ -4,7 +4,7 @@
     "name": "HitSpan",
     "description": "Range + knockback HUD",
     "logoFile": "assets/hitspan/icon2.png",
-    "version": "1.2.2",
+    "version": "1.2.3",
     "mcversion": "1.8.9",
     "authorList": ["bewf"]
   }

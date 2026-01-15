@@ -19,7 +19,6 @@ public class RangeTracker {
     public static double lastRange = -1;
     public static long lastRangeTimeMs = 0;
 
-    // Used by the mixin to confirm hits
     public static RangeTracker INSTANCE;
     public RangeTracker() { INSTANCE = this; }
 
@@ -28,31 +27,58 @@ public class RangeTracker {
     private int pendingPrevHurtResistantTime = 0;
     private int pendingTicksLeft = 0;
 
+    private double pendingRange = -1;
+
+    private double pendingStartY = 0;
+    private int pendingAgeTicks = 0;
+
+    private int lastConfirmedEntityId = -1;
+    private long lastConfirmedTimeMs = 0;
+
     @SubscribeEvent
     public void onAttack(AttackEntityEvent event) {
         if (mc.thePlayer == null || mc.theWorld == null) return;
         if (event.target == null) return;
 
         HitSpanConfig cfg = HitSpanConfig.INSTANCE;
+
         if (cfg != null && cfg.playersOnly && !(event.target instanceof EntityPlayer)) return;
         if (!(event.target instanceof EntityLivingBase)) return;
 
         EntityLivingBase target = (EntityLivingBase) event.target;
+
+        boolean confirmedOnly = cfg != null && cfg.confirmRangeOnHitConfirm;
+
+        if (confirmedOnly && cfg != null && cfg.confirmCooldownEnabled) {
+            long now = System.currentTimeMillis();
+            if (target.getEntityId() == lastConfirmedEntityId) {
+                long cd = Math.max(0, cfg.confirmCooldownMs);
+                if (cd > 0 && (now - lastConfirmedTimeMs) < cd) {
+                    return;
+                }
+            }
+        }
 
         double maxReach = mc.thePlayer.capabilities.isCreativeMode ? 4.5D : 3.0D;
         double computed = computeEntityRayDistance(mc.thePlayer, target, 1.0F, maxReach);
         if (computed < 0) return;
         if (computed > maxReach) computed = maxReach;
 
-        // ✅ ALWAYS update range immediately (even if server later rejects)
-        lastRange = computed;
-        lastRangeTimeMs = System.currentTimeMillis();
+        if (!confirmedOnly) {
+            lastRange = computed;
+            lastRangeTimeMs = System.currentTimeMillis();
+            return;
+        }
 
-        // Pending confirmation (ONLY used to start KB tracking)
+        // pending confirm window (short)
+        pendingRange = computed;
         pendingEntityId = target.getEntityId();
         pendingPrevHurtTime = target.hurtTime;
         pendingPrevHurtResistantTime = target.hurtResistantTime;
-        pendingTicksLeft = 10;
+
+        pendingStartY = target.posY;
+        pendingAgeTicks = 0;
+        pendingTicksLeft = 3;
     }
 
     @SubscribeEvent
@@ -62,17 +88,35 @@ public class RangeTracker {
 
         if (pendingTicksLeft > 0 && pendingEntityId != -1) {
             pendingTicksLeft--;
+            pendingAgeTicks++;
 
             Entity e = mc.theWorld.getEntityByID(pendingEntityId);
             if (e instanceof EntityLivingBase) {
                 EntityLivingBase target = (EntityLivingBase) e;
 
+                HitSpanConfig cfg = HitSpanConfig.INSTANCE;
+                boolean confirmedOnly = cfg != null && cfg.confirmRangeOnHitConfirm;
+
                 boolean hurtTimeIncreased = target.hurtTime > pendingPrevHurtTime;
                 boolean resistantIncreased = target.hurtResistantTime > pendingPrevHurtResistantTime;
 
-                if (hurtTimeIncreased || resistantIncreased) {
-                    // ✅ Confirmed hit: start KB tracking
+                boolean verticalConfirmed = false;
+                if (cfg != null && cfg.verticalConfirmEnabled) {
+                    double dy = Math.abs(target.posY - pendingStartY);
+                    verticalConfirmed = dy >= Math.max(0.0f, cfg.verticalConfirmThreshold);
+                }
+
+                if (hurtTimeIncreased || resistantIncreased || verticalConfirmed) {
                     KnockbackTracker.beginTracking(target);
+
+                    if (confirmedOnly && pendingRange >= 0) {
+                        lastRange = pendingRange;
+                        lastRangeTimeMs = System.currentTimeMillis();
+                    }
+
+                    lastConfirmedEntityId = pendingEntityId;
+                    lastConfirmedTimeMs = System.currentTimeMillis();
+
                     clearPending();
                     return;
                 }
@@ -84,7 +128,7 @@ public class RangeTracker {
         }
     }
 
-    // Called by mixin when we receive the server "hurt animation" packet (opcode 2)
+    // hurt animation packet fallback
     public void confirmFromHurtPacket(int entityId) {
         if (pendingEntityId == -1) return;
         if (entityId != pendingEntityId) return;
@@ -93,9 +137,18 @@ public class RangeTracker {
 
         Entity e = mc.theWorld.getEntityByID(pendingEntityId);
         if (e instanceof EntityLivingBase) {
-            // ✅ Confirmed hit: start KB tracking
             KnockbackTracker.beginTracking((EntityLivingBase) e);
+
+            HitSpanConfig cfg = HitSpanConfig.INSTANCE;
+            if (cfg != null && cfg.confirmRangeOnHitConfirm && pendingRange >= 0) {
+                lastRange = pendingRange;
+                lastRangeTimeMs = System.currentTimeMillis();
+            }
+
+            lastConfirmedEntityId = pendingEntityId;
+            lastConfirmedTimeMs = System.currentTimeMillis();
         }
+
         clearPending();
     }
 
@@ -104,6 +157,10 @@ public class RangeTracker {
         pendingTicksLeft = 0;
         pendingPrevHurtTime = 0;
         pendingPrevHurtResistantTime = 0;
+
+        pendingRange = -1;
+        pendingStartY = 0;
+        pendingAgeTicks = 0;
     }
 
     private static double computeEntityRayDistance(EntityLivingBase player, Entity target, float partialTicks, double maxDist) {
