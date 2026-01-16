@@ -11,9 +11,9 @@ I made this because there are no good alternatives for 1.8.9. If you run into is
 
 ---
 
-<p align="center" width="100%">
-<video src="https://github.com/bewf/HitSpan/raw/main/GitAssets/ExampleVid.mp4" width="80%" controls></video>
-<sub><em>Example of HitSpan in use.</em></sub>
+<p align="center">
+  <img src="https://github.com/bewf/HitSpan/raw/main/GitAssets/ExampleVid.gif" width="520"><br>
+  <sub><em>Example of HitSpan in use.</em></sub>
 </p>
 
 ---
