@@ -2,7 +2,6 @@
   <img src="https://github.com/bewf/HitSpan/raw/main/GitAssets/icon4.png" width="400">
 </p>
 
-
 **HitSpan** is a lightweight, client-side HUD mod for Minecraft **1.8.9** that displays:
 
 - **Hit range (reach)**
@@ -10,8 +9,14 @@
 
 I made this because there are no good alternatives for 1.8.9. If you run into issues or have suggestions, feel free to open an issue on [GitHub](https://github.com/bewf/HitSpan/issues)
 
+---
 
+<p align="center" width="100%">
+<video src="https://github.com/bewf/HitSpan/raw/main/GitAssets/ExampleVid.mp4" width="80%" controls></video>
+<sub><em>Example of HitSpan in use.</em></sub>
+</p>
 
+---
 
 ## Features
 
@@ -44,4 +49,3 @@ I made this because there are no good alternatives for 1.8.9. If you run into is
 ---
 
 ##### Code licensed under [ARR](https://github.com/bewf/HitSpan/blob/main/LICENSE.md). Unmodified redistribution is permitted with credit. See the [full license](https://github.com/bewf/HitSpan/blob/main/LICENSE.md) for details.
-
