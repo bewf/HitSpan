@@ -12,7 +12,7 @@ I made this because there are no good alternatives for 1.8.9. If you run into is
 ---
 
 <p align="center">
-  <img src="https://github.com/bewf/HitSpan/raw/main/GitAssets/ExampleGif.gif" width="520"><br>
+  <img src="https://github.com/bewf/HitSpan/raw/main/GitAssets/ExampleGifCrop.gif" width="520"><br>
   <sub><em>Example of HitSpan in use.</em></sub>
 </p>
 
