@@ -10,28 +10,34 @@ public class KnockbackTracker {
 
     private static final Minecraft mc = Minecraft.getMinecraft();
 
-    // Public values HUD reads
     public static double lastKB = -1;
     public static long lastKBTimeMs = 0;
 
-    // Tracking state
     private static int trackingEntityId = -1;
     private static double startX = 0;
     private static double startZ = 0;
     private static int ticksLeft = 0;
     private static double maxHorizDisp = 0;
 
-    // Called by RangeTracker when a hit is confirmed
+    private static int lastBeginEntityId = -1;
+    private static long lastBeginTimeMs = 0;
+
     public static void beginTracking(EntityLivingBase target) {
-        trackingEntityId = target.getEntityId();
+        long now = System.currentTimeMillis();
+        int id = target.getEntityId();
+
+        if (id == lastBeginEntityId && (now - lastBeginTimeMs) < 120) return;
+        lastBeginEntityId = id;
+        lastBeginTimeMs = now;
+
+        trackingEntityId = id;
         startX = target.posX;
         startZ = target.posZ;
-        ticksLeft = 8;          // measure over next ~8 ticks
+        ticksLeft = 8;
         maxHorizDisp = 0;
 
-        // reset lastKB when a new hit starts tracking (optional)
         lastKB = 0;
-        lastKBTimeMs = System.currentTimeMillis();
+        lastKBTimeMs = now;
     }
 
     @SubscribeEvent

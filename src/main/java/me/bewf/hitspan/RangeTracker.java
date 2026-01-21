@@ -11,6 +11,7 @@ import net.minecraft.util.Vec3;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import org.lwjgl.input.Mouse;
 
 public class RangeTracker {
 
@@ -22,101 +23,51 @@ public class RangeTracker {
     public static RangeTracker INSTANCE;
     public RangeTracker() { INSTANCE = this; }
 
+    private boolean leftWasDown = false;
+    private int clickSeq = 0;
+    private int lastProcessedClickSeq = -1;
+
     private int pendingEntityId = -1;
-    private int pendingPrevHurtTime = 0;
-    private int pendingPrevHurtResistantTime = 0;
+    private double pendingRange = -1;
     private int pendingTicksLeft = 0;
 
-    private double pendingRange = -1;
+    private int pendingPrevHurtTime = 0;
+    private int pendingPrevHurtResistantTime = 0;
 
-    private double pendingStartY = 0;
-    private int pendingAgeTicks = 0;
+    private long lastConfirmTimeMs = 0;
 
-    private int lastConfirmedEntityId = -1;
-    private long lastConfirmedTimeMs = 0;
+    private static final int PENDING_WINDOW_TICKS = 10;
+    private static final long CONFIRM_DEDUPE_MS = 120;
 
-    @SubscribeEvent
-    public void onAttack(AttackEntityEvent event) {
-        if (mc.thePlayer == null || mc.theWorld == null) return;
-        if (event.target == null) return;
-
-        HitSpanConfig cfg = HitSpanConfig.INSTANCE;
-
-        if (cfg != null && cfg.playersOnly && !(event.target instanceof EntityPlayer)) return;
-        if (!(event.target instanceof EntityLivingBase)) return;
-
-        EntityLivingBase target = (EntityLivingBase) event.target;
-
-        boolean confirmedOnly = cfg != null && cfg.confirmRangeOnHitConfirm;
-
-        if (confirmedOnly && cfg != null && cfg.confirmCooldownEnabled) {
-            long now = System.currentTimeMillis();
-            if (target.getEntityId() == lastConfirmedEntityId) {
-                long cd = Math.max(0, cfg.confirmCooldownMs);
-                if (cd > 0 && (now - lastConfirmedTimeMs) < cd) {
-                    return;
-                }
-            }
-        }
-
-        double maxReach = mc.thePlayer.capabilities.isCreativeMode ? 4.5D : 3.0D;
-        double computed = computeEntityRayDistance(mc.thePlayer, target, 1.0F, maxReach);
-        if (computed < 0) return;
-        if (computed > maxReach) computed = maxReach;
-
-        if (!confirmedOnly) {
-            lastRange = computed;
-            lastRangeTimeMs = System.currentTimeMillis();
-            return;
-        }
-
-        // pending confirm window (short)
-        pendingRange = computed;
-        pendingEntityId = target.getEntityId();
-        pendingPrevHurtTime = target.hurtTime;
-        pendingPrevHurtResistantTime = target.hurtResistantTime;
-
-        pendingStartY = target.posY;
-        pendingAgeTicks = 0;
-        pendingTicksLeft = 3;
-    }
+    private long lastImmediateWorldTime = -1;
+    private int lastImmediateEntityId = -1;
 
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
         if (mc.theWorld == null) return;
 
-        if (pendingTicksLeft > 0 && pendingEntityId != -1) {
+        boolean leftDown = Mouse.isButtonDown(0);
+        if (leftDown && !leftWasDown) {
+            clickSeq++;
+        }
+        leftWasDown = leftDown;
+
+        if (pendingEntityId != -1 && pendingTicksLeft > 0) {
             pendingTicksLeft--;
-            pendingAgeTicks++;
 
             Entity e = mc.theWorld.getEntityByID(pendingEntityId);
             if (e instanceof EntityLivingBase) {
-                EntityLivingBase target = (EntityLivingBase) e;
+                EntityLivingBase t = (EntityLivingBase) e;
 
-                HitSpanConfig cfg = HitSpanConfig.INSTANCE;
-                boolean confirmedOnly = cfg != null && cfg.confirmRangeOnHitConfirm;
+                int curHurtTime = t.hurtTime;
+                int curResist = t.hurtResistantTime;
 
-                boolean hurtTimeIncreased = target.hurtTime > pendingPrevHurtTime;
-                boolean resistantIncreased = target.hurtResistantTime > pendingPrevHurtResistantTime;
+                boolean hurtTimeBumped = curHurtTime > pendingPrevHurtTime + 1;
+                boolean resistBumped = curResist > pendingPrevHurtResistantTime + 2;
 
-                boolean verticalConfirmed = false;
-                if (cfg != null && cfg.verticalConfirmEnabled) {
-                    double dy = Math.abs(target.posY - pendingStartY);
-                    verticalConfirmed = dy >= Math.max(0.0f, cfg.verticalConfirmThreshold);
-                }
-
-                if (hurtTimeIncreased || resistantIncreased || verticalConfirmed) {
-                    KnockbackTracker.beginTracking(target);
-
-                    if (confirmedOnly && pendingRange >= 0) {
-                        lastRange = pendingRange;
-                        lastRangeTimeMs = System.currentTimeMillis();
-                    }
-
-                    lastConfirmedEntityId = pendingEntityId;
-                    lastConfirmedTimeMs = System.currentTimeMillis();
-
+                if (hurtTimeBumped || resistBumped) {
+                    confirmPending(t);
                     clearPending();
                     return;
                 }
@@ -128,39 +79,85 @@ public class RangeTracker {
         }
     }
 
-    // hurt animation packet fallback
+    @SubscribeEvent
+    public void onAttack(AttackEntityEvent event) {
+        if (mc.thePlayer == null || mc.theWorld == null) return;
+        if (event == null || event.target == null) return;
+
+        if (event.entityPlayer == null || event.entityPlayer.worldObj == null) return;
+        if (!event.entityPlayer.worldObj.isRemote) return;
+
+        HitSpanConfig cfg = HitSpanConfig.INSTANCE;
+
+        if (cfg != null && cfg.playersOnly && !(event.target instanceof EntityPlayer)) return;
+        if (!(event.target instanceof EntityLivingBase)) return;
+
+        EntityLivingBase target = (EntityLivingBase) event.target;
+
+        double maxReach = mc.thePlayer.capabilities.isCreativeMode ? 4.5D : 3.0D;
+        double computed = computeEntityRayDistance(mc.thePlayer, target, 1.0F, maxReach);
+        if (computed < 0) return;
+        if (computed > maxReach) computed = maxReach;
+
+        boolean confirmedOnly = cfg != null && cfg.confirmRangeOnHitConfirm;
+
+        if (!confirmedOnly) {
+            long wt = mc.theWorld.getTotalWorldTime();
+            int id = target.getEntityId();
+
+            if (wt == lastImmediateWorldTime && id == lastImmediateEntityId) return;
+            lastImmediateWorldTime = wt;
+            lastImmediateEntityId = id;
+
+            lastRange = computed;
+            lastRangeTimeMs = System.currentTimeMillis();
+            KnockbackTracker.beginTracking(target);
+            return;
+        }
+
+        if (clickSeq == lastProcessedClickSeq) return;
+        lastProcessedClickSeq = clickSeq;
+
+        pendingEntityId = target.getEntityId();
+        pendingRange = computed;
+        pendingPrevHurtTime = target.hurtTime;
+        pendingPrevHurtResistantTime = target.hurtResistantTime;
+        pendingTicksLeft = PENDING_WINDOW_TICKS;
+    }
+
     public void confirmFromHurtPacket(int entityId) {
+        if (mc.theWorld == null) return;
         if (pendingEntityId == -1) return;
         if (entityId != pendingEntityId) return;
         if (pendingTicksLeft <= 0) return;
-        if (mc.theWorld == null) return;
 
         Entity e = mc.theWorld.getEntityByID(pendingEntityId);
         if (e instanceof EntityLivingBase) {
-            KnockbackTracker.beginTracking((EntityLivingBase) e);
-
-            HitSpanConfig cfg = HitSpanConfig.INSTANCE;
-            if (cfg != null && cfg.confirmRangeOnHitConfirm && pendingRange >= 0) {
-                lastRange = pendingRange;
-                lastRangeTimeMs = System.currentTimeMillis();
-            }
-
-            lastConfirmedEntityId = pendingEntityId;
-            lastConfirmedTimeMs = System.currentTimeMillis();
+            confirmPending((EntityLivingBase) e);
         }
 
         clearPending();
     }
 
+    private void confirmPending(EntityLivingBase target) {
+        long now = System.currentTimeMillis();
+        if (now - lastConfirmTimeMs < CONFIRM_DEDUPE_MS) return;
+        lastConfirmTimeMs = now;
+
+        if (pendingRange >= 0) {
+            lastRange = pendingRange;
+            lastRangeTimeMs = now;
+        }
+
+        KnockbackTracker.beginTracking(target);
+    }
+
     private void clearPending() {
         pendingEntityId = -1;
+        pendingRange = -1;
         pendingTicksLeft = 0;
         pendingPrevHurtTime = 0;
         pendingPrevHurtResistantTime = 0;
-
-        pendingRange = -1;
-        pendingStartY = 0;
-        pendingAgeTicks = 0;
     }
 
     private static double computeEntityRayDistance(EntityLivingBase player, Entity target, float partialTicks, double maxDist) {

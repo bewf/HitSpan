@@ -13,10 +13,6 @@ public class HitSpanConfig extends Config {
 
     public static HitSpanConfig INSTANCE;
 
-    // -------------------------
-    // General
-    // -------------------------
-
     @Number(
             name = "Decay Time (ms)",
             description = "How long before values reset or the HUD hides",
@@ -42,55 +38,13 @@ public class HitSpanConfig extends Config {
     )
     public boolean playersOnly = true;
 
-    // -------------------------
-    // Range
-    // -------------------------
-
     @Checkbox(
             name = "Confirmed Hit Only",
-            description = "Only update Range when a hit is confirmed",
+            description = "Only update Range when the server sends a hurt confirm",
             category = "Range",
             subcategory = "Confirmation"
     )
     public boolean confirmRangeOnHitConfirm = true;
-
-    @Checkbox(
-            name = "Confirm Cooldown",
-            description = "Blocks repeated confirms on the same target for a short time after a confirmed hit",
-            category = "Range",
-            subcategory = "Confirmation"
-    )
-    public boolean confirmCooldownEnabled = true;
-
-    @Number(
-            name = "Confirm Cooldown (ms)",
-            description = "Cooldown after a confirmed hit",
-            min = 0, max = 2000,
-            category = "Range",
-            subcategory = "Confirmation"
-    )
-    public int confirmCooldownMs = 500;
-
-    @Checkbox(
-            name = "Vertical Confirm",
-            description = "Tiny vertical movement check (helps sometimes, can be turned off)",
-            category = "Range",
-            subcategory = "Confirmation"
-    )
-    public boolean verticalConfirmEnabled = true;
-
-    @Number(
-            name = "Vertical Threshold",
-            description = "Minimum vertical movement to count as confirmed",
-            min = 0, max = 1,
-            category = "Range",
-            subcategory = "Confirmation"
-    )
-    public float verticalConfirmThreshold = 0.05f;
-
-    // -------------------------
-    // Range -> Dynamic Range
-    // -------------------------
 
     @Checkbox(
             name = "Enabled",
@@ -118,10 +72,6 @@ public class HitSpanConfig extends Config {
     )
     public float rangeYellowMin = 1.5f;
 
-    // -------------------------
-    // HUDs
-    // -------------------------
-
     @HUD(name = "Range HUD", category = "HUD")
     public final RangeHud rangeHud = new RangeHud();
 
@@ -137,12 +87,7 @@ public class HitSpanConfig extends Config {
                 ),
                 "hitspan.json"
         );
-
-        try {
-            initialize();
-        } catch (NoClassDefFoundError e) {
-            System.err.println("OneConfig internal classes not found; skipping config initialization: " + e.getMessage());
-        }
+        initialize();
     }
 
     public static void init() {
