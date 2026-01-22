@@ -4,6 +4,7 @@ import cc.polyfrost.oneconfig.config.Config;
 import cc.polyfrost.oneconfig.config.annotations.Checkbox;
 import cc.polyfrost.oneconfig.config.annotations.HUD;
 import cc.polyfrost.oneconfig.config.annotations.Number;
+import cc.polyfrost.oneconfig.config.annotations.Text;
 import cc.polyfrost.oneconfig.config.data.Mod;
 import cc.polyfrost.oneconfig.config.data.ModType;
 import me.bewf.hitspan.hud.KnockbackHud;
@@ -71,6 +72,30 @@ public class HitSpanConfig extends Config {
             subcategory = "Dynamic Range"
     )
     public float rangeYellowMin = 1.5f;
+
+    @Text(
+            name = "Range Label",
+            description = "Text shown before the range value",
+            category = "HUD",
+            subcategory = "Labels"
+    )
+    public String rangeLabel = "Range";
+
+    @Text(
+            name = "KB Label",
+            description = "Text shown before the knockback value",
+            category = "HUD",
+            subcategory = "Labels"
+    )
+    public String knockbackLabel = "KB";
+
+    @Text(
+            name = "Label Separator",
+            description = "Text between the label and the number",
+            category = "HUD",
+            subcategory = "Labels"
+    )
+    public String labelSeparator = ": ";
 
     @HUD(name = "Range HUD", category = "HUD")
     public final RangeHud rangeHud = new RangeHud();

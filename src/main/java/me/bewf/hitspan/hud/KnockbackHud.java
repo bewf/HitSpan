@@ -17,13 +17,16 @@ public class KnockbackHud extends TextHud {
 
     @Override
     protected void getLines(List<String> lines, boolean example) {
-        if (example) {
-            lines.add("KB: 0.40");
-            return;
-        }
-
         HitSpanConfig cfg = HitSpanConfig.INSTANCE;
         if (cfg == null) return;
+
+        String label = cfg.knockbackLabel != null ? cfg.knockbackLabel.trim() : "";
+        String sep = cfg.labelSeparator != null ? cfg.labelSeparator : ": ";
+
+        if (example) {
+            lines.add(label + sep + "0.40");
+            return;
+        }
 
         long now = System.currentTimeMillis();
 
@@ -37,6 +40,6 @@ public class KnockbackHud extends TextHud {
         if (now - KnockbackTracker.lastKBTimeMs > cfg.decayTimeMs) val = 0.0;
         if (val < 0.0) val = 0.0;
 
-        lines.add("KB: " + DF.format(val));
+        lines.add(label + sep + DF.format(val));
     }
 }

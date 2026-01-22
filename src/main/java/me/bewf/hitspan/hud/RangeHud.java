@@ -17,13 +17,16 @@ public class RangeHud extends TextHud {
 
     @Override
     protected void getLines(List<String> lines, boolean example) {
-        if (example) {
-            lines.add("Range: 3.00");
-            return;
-        }
-
         HitSpanConfig cfg = HitSpanConfig.INSTANCE;
         if (cfg == null) return;
+
+        String label = cfg.rangeLabel != null ? cfg.rangeLabel.trim() : "";
+        String sep = cfg.labelSeparator != null ? cfg.labelSeparator : ": ";
+
+        if (example) {
+            lines.add(label + sep + "3.00");
+            return;
+        }
 
         long now = System.currentTimeMillis();
 
@@ -46,6 +49,6 @@ public class RangeHud extends TextHud {
             num = DF.format(val);
         }
 
-        lines.add("Range: " + num);
+        lines.add(label + sep + num);
     }
 }
