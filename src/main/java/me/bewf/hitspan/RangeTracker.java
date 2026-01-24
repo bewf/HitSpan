@@ -5,9 +5,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -45,7 +45,7 @@ public class RangeTracker {
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
-        if (mc.theWorld == null) return;
+        if (mc.world == null) return;
 
         boolean leftDown = Mouse.isButtonDown(0);
         if (leftDown && !leftWasDown) {
@@ -56,7 +56,7 @@ public class RangeTracker {
         if (pendingEntityId != -1 && pendingTicksLeft > 0) {
             pendingTicksLeft--;
 
-            Entity e = mc.theWorld.getEntityByID(pendingEntityId);
+            Entity e = mc.world.getEntityByID(pendingEntityId);
             if (e instanceof EntityLivingBase) {
                 EntityLivingBase t = (EntityLivingBase) e;
 
@@ -81,28 +81,28 @@ public class RangeTracker {
 
     @SubscribeEvent
     public void onAttack(AttackEntityEvent event) {
-        if (mc.thePlayer == null || mc.theWorld == null) return;
-        if (event == null || event.target == null) return;
+        if (mc.player == null || mc.world == null) return;
+        if (event == null || event.getTarget() == null) return;
 
-        if (event.entityPlayer == null || event.entityPlayer.worldObj == null) return;
-        if (!event.entityPlayer.worldObj.isRemote) return;
+        if (event.getEntityPlayer() == null || event.getEntityPlayer().world == null) return;
+        if (!event.getEntityPlayer().world.isRemote) return;
 
         HitSpanConfig cfg = HitSpanConfig.INSTANCE;
 
-        if (cfg != null && cfg.playersOnly && !(event.target instanceof EntityPlayer)) return;
-        if (!(event.target instanceof EntityLivingBase)) return;
+        if (cfg != null && cfg.playersOnly && !(event.getTarget() instanceof EntityPlayer)) return;
+        if (!(event.getTarget() instanceof EntityLivingBase)) return;
 
-        EntityLivingBase target = (EntityLivingBase) event.target;
+        EntityLivingBase target = (EntityLivingBase) event.getTarget();
 
-        double maxReach = mc.thePlayer.capabilities.isCreativeMode ? 4.5D : 3.0D;
-        double computed = computeEntityRayDistance(mc.thePlayer, target, 1.0F, maxReach);
+        double maxReach = mc.player.capabilities.isCreativeMode ? 4.5D : 3.0D;
+        double computed = computeEntityRayDistance(mc.player, target, 1.0F, maxReach);
         if (computed < 0) return;
         if (computed > maxReach) computed = maxReach;
 
         boolean confirmedOnly = cfg != null && cfg.confirmRangeOnHitConfirm;
 
         if (!confirmedOnly) {
-            long wt = mc.theWorld.getTotalWorldTime();
+            long wt = mc.world.getTotalWorldTime();
             int id = target.getEntityId();
 
             if (wt == lastImmediateWorldTime && id == lastImmediateEntityId) return;
@@ -126,12 +126,12 @@ public class RangeTracker {
     }
 
     public void confirmFromHurtPacket(int entityId) {
-        if (mc.theWorld == null) return;
+        if (mc.world == null) return;
         if (pendingEntityId == -1) return;
         if (entityId != pendingEntityId) return;
         if (pendingTicksLeft <= 0) return;
 
-        Entity e = mc.theWorld.getEntityByID(pendingEntityId);
+        Entity e = mc.world.getEntityByID(pendingEntityId);
         if (e instanceof EntityLivingBase) {
             confirmPending((EntityLivingBase) e);
         }
@@ -161,14 +161,14 @@ public class RangeTracker {
     }
 
     private static double computeEntityRayDistance(EntityLivingBase player, Entity target, float partialTicks, double maxDist) {
-        Vec3 eyes = player.getPositionEyes(partialTicks);
-        Vec3 look = player.getLook(partialTicks);
-        Vec3 end = eyes.addVector(look.xCoord * maxDist, look.yCoord * maxDist, look.zCoord * maxDist);
+        Vec3d eyes = player.getPositionEyes(partialTicks);
+        Vec3d look = player.getLook(partialTicks);
+        Vec3d end = eyes.add(look.x * maxDist, look.y * maxDist, look.z * maxDist);
 
         float border = target.getCollisionBorderSize();
         AxisAlignedBB bb = target.getEntityBoundingBox().expand(border, border, border);
 
-        MovingObjectPosition hit = bb.calculateIntercept(eyes, end);
+        RayTraceResult hit = bb.calculateIntercept(eyes, end);
         if (hit == null || hit.hitVec == null) return -1;
 
         return hit.hitVec.distanceTo(eyes);

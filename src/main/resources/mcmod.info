@@ -5,7 +5,7 @@
     "description": "Range + knockback HUD",
     "logoFile": "assets/hitspan/icon2.png",
     "version": "1.2.6",
-    "mcversion": "1.8.9",
+    "mcversion": "1.12.2",
     "authorList": ["bewf"]
   }
 ]

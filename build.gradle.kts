@@ -48,10 +48,10 @@ repositories {
 }
 
 dependencies {
-    // OneConfig runtime and api
-    implementation("cc.polyfrost:oneconfig-1.8.9-forge:0.2.2-alpha+")
-    shade("cc.polyfrost:oneconfig-1.8.9-forge:0.2.2-alpha+")
-    include("cc.polyfrost:oneconfig-1.8.9-forge:0.2.2-alpha+")
+    // OneConfig runtime and api (1.12.2)
+    implementation("cc.polyfrost:oneconfig-1.12.2-forge:0.2.2-alpha223")
+    shade("cc.polyfrost:oneconfig-1.12.2-forge:0.2.2-alpha223")
+    include("cc.polyfrost:oneconfig-1.12.2-forge:0.2.2-alpha223")
 
     // OneConfig wrapper for LaunchWrapper
     implementation("cc.polyfrost:oneconfig-wrapper-launchwrapper:1.0.0-beta17")

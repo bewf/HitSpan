@@ -43,12 +43,12 @@ public class KnockbackTracker {
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
-        if (mc.theWorld == null) return;
+        if (mc.world == null) return;
 
         if (ticksLeft > 0 && trackingEntityId != -1) {
             ticksLeft--;
 
-            Entity e = mc.theWorld.getEntityByID(trackingEntityId);
+            Entity e = mc.world.getEntityByID(trackingEntityId);
             if (e != null) {
                 double dx = e.posX - startX;
                 double dz = e.posZ - startZ;
