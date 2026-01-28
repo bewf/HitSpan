@@ -37,11 +37,20 @@ If you run into issues or have suggestions, feel free to open an issue on [GitHu
   - Does not send packets or modify reach.
   - Safe to use on servers.
 
----
-<p align="center">
-  <img src="https://cdn.modrinth.com/data/cached_images/61c1c0fafd6fc225cb29c0d5c684d2fe0ab212f5.png" width="400"><br>
-  <sub><em>Example HUD (my personal customization).</em></sub>
+## OneConfig Integration
+
+<p align="center" style="line-height: 0;">
+  <img src="https://cdn.modrinth.com/data/cached_images/7909a8944c0c72fdad02477c21223cf2f2cfee41.png" width="750" style="display:block;">
+  <img src="https://cdn.modrinth.com/data/cached_images/d591d27df557b88da2c8ae5f6f91f559aebb093a.png" width="750" style="display:block;">
+  <img src="https://cdn.modrinth.com/data/cached_images/a41c9e5aa9f09fbf4e96c45283d729d3976f7ea7_0.webp" width="750" style="display:block;">
 </p>
+
+<p align="center">
+  <sub><em>HitSpan is fully configurable through OneConfig.</em></sub>
+</p>
+
+
+
 
 ---
 
