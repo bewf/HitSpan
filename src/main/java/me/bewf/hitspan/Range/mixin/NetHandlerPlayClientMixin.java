@@ -1,6 +1,9 @@
-package me.bewf.hitspan.mixin;
+// src/main/java/me/bewf/hitspan/Range/mixin/NetHandlerPlayClientMixin.java
+package me.bewf.hitspan.Range.mixin;
 
-import me.bewf.hitspan.RangeTracker;
+import me.bewf.hitspan.Range.util.RangeTracker;
+import me.bewf.hitspan.config.HitSpanConfig;
+import me.bewf.hitspan.debug.HitSpanDebug;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.Entity;
@@ -15,7 +18,6 @@ public class NetHandlerPlayClientMixin {
 
     @Inject(method = "handleEntityStatus", at = @At("HEAD"))
     private void hitspan$onEntityStatus(S19PacketEntityStatus packet, CallbackInfo ci) {
-        // 2 = hurt animation opcode in 1.8.9
         if (packet.getOpCode() != 2) return;
 
         Minecraft mc = Minecraft.getMinecraft();
@@ -23,6 +25,11 @@ public class NetHandlerPlayClientMixin {
 
         Entity e = packet.getEntity(mc.theWorld);
         if (e == null) return;
+
+        HitSpanConfig cfg = HitSpanConfig.INSTANCE;
+        if (cfg != null && cfg.debugEnabled && cfg.debugPackets) {
+            HitSpanDebug.chat("S19 opcode=2 ent=" + e.getEntityId());
+        }
 
         if (RangeTracker.INSTANCE != null) {
             RangeTracker.INSTANCE.confirmFromHurtPacket(e.getEntityId());

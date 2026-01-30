@@ -31,7 +31,9 @@ toolkitLoomHelper {
         }
     }
 
+    // DevAuth (already wires deps + run args through DGT)
     useDevAuth("1.2.1")
+
     useMixinExtras("0.4.1")
 
     disableRunConfigs(GameSide.SERVER)
@@ -91,6 +93,16 @@ tasks.withType<Jar>().configureEach {
     manifest.attributes.remove("Class-Path")
 }
 
+configurations.all {
+    exclude(group = "org.jetbrains.kotlin", module = "kotlin-reflect")
+}
+
 tasks.named<JavaExec>("runClient") {
     args("--tweakClass", "cc.polyfrost.oneconfig.loader.stage0.LaunchWrapperTweaker")
+
+    // DevAuth enable + pick account
+    jvmArgs(
+        "-Ddevauth.enabled=true",
+        "-Ddevauth.account=main"
+    )
 }

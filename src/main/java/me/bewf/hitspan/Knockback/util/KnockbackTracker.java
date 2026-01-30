@@ -1,10 +1,11 @@
-package me.bewf.hitspan;
+// src/main/java/me/bewf/hitspan/Knockback/util/KnockbackTracker.java
+package me.bewf.hitspan.Knockback.util;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 public class KnockbackTracker {
 
