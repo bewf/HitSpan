@@ -1,10 +1,10 @@
 [
   {
-    "modid": "hitspan",
-    "name": "HitSpan",
+    "modid": "${mod_id}",
+    "name": "${mod_name}",
     "description": "Range + knockback HUD",
     "logoFile": "assets/hitspan/icon2.png",
-    "version": "1.3.0",
+    "version": "${mod_version}",
     "mcversion": "1.8.9",
     "authorList": ["bewf"]
   }

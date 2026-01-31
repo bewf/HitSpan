@@ -15,6 +15,14 @@ plugins {
     id("dev.deftu.gradle.tools.minecraft.releases") version(dgtVersion)
 }
 
+val modName = providers.gradleProperty("mod.name").get()
+val modId = providers.gradleProperty("mod.id").get()
+val modVersion = providers.gradleProperty("mod.version").get()
+val modGroup = providers.gradleProperty("mod.group").get()
+
+group = modGroup
+version = modVersion
+
 toolkitLoomHelper {
     useOneConfig {
         version = "1.0.0-alpha.106"
@@ -23,7 +31,6 @@ toolkitLoomHelper {
         usePolyMixin = true
         polyMixinVersion = "0.8.4+build.2"
 
-        // I embed stage0 in my jar, so I keep this off.
         applyLoaderTweaker = false
 
         for (module in arrayOf("commands", "config", "config-impl", "events", "hud", "internal", "ui", "utils")) {
@@ -31,9 +38,7 @@ toolkitLoomHelper {
         }
     }
 
-    // DevAuth (already wires deps + run args through DGT)
     useDevAuth("1.2.1")
-
     useMixinExtras("0.4.1")
 
     disableRunConfigs(GameSide.SERVER)
@@ -50,17 +55,14 @@ repositories {
 }
 
 dependencies {
-    // OneConfig runtime and api
     implementation("cc.polyfrost:oneconfig-1.8.9-forge:0.2.2-alpha+")
     shade("cc.polyfrost:oneconfig-1.8.9-forge:0.2.2-alpha+")
     include("cc.polyfrost:oneconfig-1.8.9-forge:0.2.2-alpha+")
 
-    // OneConfig wrapper for LaunchWrapper
     implementation("cc.polyfrost:oneconfig-wrapper-launchwrapper:1.0.0-beta17")
     shade("cc.polyfrost:oneconfig-wrapper-launchwrapper:1.0.0-beta17")
     include("cc.polyfrost:oneconfig-wrapper-launchwrapper:1.0.0-beta17")
 
-    // Stage0 (this contains the LaunchWrapperTweaker class)
     implementation("org.polyfrost.oneconfig:stage0:1.1.0-alpha.46")
     shade("org.polyfrost.oneconfig:stage0:1.1.0-alpha.46")
     include("org.polyfrost.oneconfig:stage0:1.1.0-alpha.46")
@@ -88,21 +90,65 @@ tasks.withType<Jar>().configureEach {
     manifest.attributes["TweakOrder"] = 0
     manifest.attributes["ForceLoadAsMod"] = true
     manifest.attributes["TweakClass"] = "cc.polyfrost.oneconfig.loader.stage0.LaunchWrapperTweaker"
-
-    // I do not ship a Class-Path list. Everything is inside the jar.
     manifest.attributes.remove("Class-Path")
 }
 
 configurations.all {
     exclude(group = "org.jetbrains.kotlin", module = "kotlin-reflect")
+
+    exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-jdk8")
+    exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
+    exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core-jvm")
 }
 
 tasks.named<JavaExec>("runClient") {
     args("--tweakClass", "cc.polyfrost.oneconfig.loader.stage0.LaunchWrapperTweaker")
-
-    // DevAuth enable + pick account
     jvmArgs(
         "-Ddevauth.enabled=true",
         "-Ddevauth.account=main"
     )
+}
+
+/* Version sync: gradle.properties -> generated HitSpan.java + mcmod.info */
+
+val generatedDir = layout.buildDirectory.dir("generated/sources/versionedHitSpan")
+
+val generateVersionedHitSpan = tasks.register<Copy>("generateVersionedHitSpan") {
+    from("src/main/java/me/bewf/hitspan/HitSpan.java")
+    into(generatedDir.map { it.dir("me/bewf/hitspan") })
+
+    filteringCharset = "UTF-8"
+
+    filter { line: String ->
+        line
+            .replace("@MOD_NAME@", modName)
+            .replace("@MOD_ID@", modId)
+            .replace("@MOD_VERSION@", modVersion)
+    }
+}
+
+val mainJavaWithoutHitSpan = fileTree("src/main/java") {
+    include("**/*.java")
+    exclude("me/bewf/hitspan/HitSpan.java")
+}
+
+tasks.named<JavaCompile>("compileJava") {
+    dependsOn(generateVersionedHitSpan)
+    setSource(mainJavaWithoutHitSpan + fileTree(generatedDir))
+}
+
+tasks.processResources {
+    inputs.property("mod_name", modName)
+    inputs.property("mod_id", modId)
+    inputs.property("mod_version", modVersion)
+
+    filesMatching("mcmod.info") {
+        expand(
+            mapOf(
+                "mod_name" to modName,
+                "mod_id" to modId,
+                "mod_version" to modVersion
+            )
+        )
+    }
 }
