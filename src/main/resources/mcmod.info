@@ -2,10 +2,15 @@
   {
     "modid": "${mod_id}",
     "name": "${mod_name}",
-    "description": "Range + knockback HUD",
-    "logoFile": "assets/hitspan/icon2.png",
+    "description": "Client-side HUD mod for hit range/reach and knockback.",
     "version": "${mod_version}",
     "mcversion": "1.8.9",
-    "authorList": ["bewf"]
+    "url": "https://modrinth.com/mod/hitspan",
+    "updateUrl": "https://modrinth.com/mod/hitspan/versions",
+    "authorList": ["bewf"],
+    "credits": "",
+    "logoFile": "assets/hitspan/icon2.png",
+    "screenshots": [],
+    "dependencies": []
   }
 ]

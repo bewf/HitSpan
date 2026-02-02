@@ -1,5 +1,5 @@
-// src/main/java/me/bewf/hitspan/Range/mixin/NetHandlerPlayClientMixin.java
-package me.bewf.hitspan.Range.mixin;
+// src/main/java/me/bewf/hitspan/mixin/NetHandlerPlayClientMixin.java
+package me.bewf.hitspan.mixin;
 
 import me.bewf.hitspan.Range.util.RangeTracker;
 import me.bewf.hitspan.config.HitSpanConfig;

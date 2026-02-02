@@ -268,6 +268,22 @@ public class HitSpanConfig extends Config {
     )
     public boolean debugConfirms = true;
 
+    @Checkbox(
+            name = "Singleplayer Server Compare",
+            description = "Singleplayer only. Compares confirmed client range vs integrated server range.",
+            category = "Debug",
+            subcategory = "General"
+    )
+    public boolean debugServerCompare = false;
+
+    @Checkbox(
+            name = "Show Server Attacker Info",
+            description = "Includes server-side attacker yaw, pitch, and position in server range debug output.",
+            category = "Debug",
+            subcategory = "General"
+    )
+    public boolean debugServerAttackerInfo = false;
+
     private HitSpanConfig() {
         super(
                 new Mod("HitSpan", ModType.UTIL_QOL, "/assets/hitspan/icon3.png"),

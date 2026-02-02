@@ -1,3 +1,4 @@
+// src/main/java/me/bewf/hitspan/HitSpan.java
 package me.bewf.hitspan;
 
 import me.bewf.hitspan.Knockback.util.KnockbackTracker;
@@ -23,7 +24,6 @@ public class HitSpan {
     public static final String MODID = "hitspan";
     public static final String VERSION = "@MOD_VERSION@";
 
-
     public static final String MC_VERSION = "1.8.9";
     public static final String LOADER = "forge";
 
@@ -48,7 +48,6 @@ public class HitSpan {
         MinecraftForge.EVENT_BUS.register(new RangeTracker());
         MinecraftForge.EVENT_BUS.register(new KnockbackTracker());
         MinecraftForge.EVENT_BUS.register(new CpsTracker());
-
         MinecraftForge.EVENT_BUS.register(new UpdateCheckListener());
 
         System.out.println("HitSpan loaded - bewf on top");

@@ -127,31 +127,43 @@ public final class UpdateChecker {
     private static IChatComponent buildMessage(String projectSlug, String displayName, String latest, String current) {
         String versionsUrl = "https://modrinth.com/mod/" + projectSlug + "/versions";
 
-        ChatComponentText root = new ChatComponentText("");
+        ChatComponentText root = new ChatComponentText("\n");
 
-        IChatComponent prefix = new ChatComponentText(EnumChatFormatting.AQUA + "[" + displayName + "] ");
-        IChatComponent text = new ChatComponentText(
+        IChatComponent prefix = new ChatComponentText(
+                EnumChatFormatting.AQUA + "[" + displayName + "] "
+        );
+
+        IChatComponent line1 = new ChatComponentText(
                 EnumChatFormatting.YELLOW + "A new update is available: " +
                         EnumChatFormatting.GOLD + latest +
                         EnumChatFormatting.YELLOW + " (current " +
                         EnumChatFormatting.GOLD + current +
-                        EnumChatFormatting.YELLOW + "). " +
-                        EnumChatFormatting.GREEN + "Click to download"
+                        EnumChatFormatting.YELLOW + ")"
         );
 
-        ChatStyle style = new ChatStyle()
+        IChatComponent line2 = new ChatComponentText(
+                "\n" +
+                        EnumChatFormatting.LIGHT_PURPLE +
+                        EnumChatFormatting.BOLD.toString() +
+                        "Click to download"
+        );
+
+        root.appendSibling(prefix);
+        root.appendSibling(line1);
+        root.appendSibling(line2);
+        root.appendSibling(new ChatComponentText("\n"));
+
+        line2.getChatStyle()
                 .setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, versionsUrl))
                 .setChatHoverEvent(new HoverEvent(
                         HoverEvent.Action.SHOW_TEXT,
-                        new ChatComponentText(EnumChatFormatting.GRAY + versionsUrl)
+                        new ChatComponentText(EnumChatFormatting.LIGHT_PURPLE + "Open versions page")
                 ));
 
-        text.setChatStyle(style);
-
-        root.appendSibling(prefix);
-        root.appendSibling(text);
         return root;
     }
+
+
 
     private static boolean isNewer(String latest, String current) {
         int[] a = parseVersion(latest);

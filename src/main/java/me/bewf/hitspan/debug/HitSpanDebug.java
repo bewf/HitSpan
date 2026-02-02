@@ -13,6 +13,7 @@ public class HitSpanDebug {
     private static int linesThisSecond = 0;
 
     private static long lastVerboseMs = 0L;
+    private static boolean warnedNotSingleplayer = false;
 
     private HitSpanDebug() {}
 
@@ -31,6 +32,58 @@ public class HitSpanDebug {
         lastVerboseMs = now;
 
         send("[HitSpan] " + msg);
+    }
+
+    public static void rangeServerCompare(int entityId, double clientRange, String source, long clientAttackTimeMs) {
+        HitSpanConfig cfg = HitSpanConfig.INSTANCE;
+        if (cfg == null || !cfg.debugEnabled || !cfg.debugServerCompare) return;
+
+        if (mc == null || mc.theWorld == null || mc.thePlayer == null) return;
+
+        if (!mc.isSingleplayer()) {
+            if (!warnedNotSingleplayer) {
+                warnedNotSingleplayer = true;
+                chat("Singleplayer server compare disabled (not in singleplayer).");
+            }
+            return;
+        }
+        warnedNotSingleplayer = false;
+
+        ServerRangeProbe.Match m =
+                ServerRangeProbe.getClosestMatch(entityId, clientAttackTimeMs, 600L);
+
+        if (m == null) {
+            chat("Range check (" + source + "): no matched server record id=" +
+                    entityId + " client=" + fmt(clientRange));
+            return;
+        }
+
+        double diff = Math.abs(clientRange - m.range);
+        long dt = m.timeMs - clientAttackTimeMs;
+
+        String msg = "Range check (" + source + "): client=" + fmt(clientRange) +
+                " server=" + fmt(m.range) +
+                " diff=" + fmt(diff) +
+                " dtMs=" + dt +
+                " id=" + entityId;
+
+        if (cfg.debugServerAttackerInfo) {
+            msg += " syaw=" + fmt1(m.yaw) +
+                    " spitch=" + fmt1(m.pitch) +
+                    " spos=(" + fmt(m.ax) + "," + fmt(m.ay) + "," + fmt(m.az) + ")";
+        }
+
+        chat(msg);
+    }
+
+    private static String fmt(double d) {
+        long x = (long) (d * 1000.0);
+        return String.valueOf(x / 1000.0);
+    }
+
+    private static String fmt1(float f) {
+        long x = (long) (f * 10.0f);
+        return String.valueOf(x / 10.0f);
     }
 
     private static void send(String msg) {
