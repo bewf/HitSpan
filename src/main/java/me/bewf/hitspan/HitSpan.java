@@ -1,6 +1,11 @@
+// src/main/java/me/bewf/hitspan/HitSpan.java
 package me.bewf.hitspan;
 
+import me.bewf.hitspan.Knockback.util.KnockbackTracker;
+import me.bewf.hitspan.Range.util.RangeTracker;
 import me.bewf.hitspan.config.HitSpanConfig;
+import me.bewf.hitspan.cps.util.CpsTracker;
+import me.bewf.hitspan.util.UpdateCheckListener;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -9,7 +14,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 @Mod(
         modid = HitSpan.MODID,
         name = "HitSpan",
-        version = "1.2.6",
+        version = "@MOD_VERSION@",
         acceptedMinecraftVersions = "[1.12.2]",
         clientSideOnly = true,
         acceptableRemoteVersions = "*"
@@ -17,6 +22,10 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 public class HitSpan {
 
     public static final String MODID = "hitspan";
+    public static final String VERSION = "@MOD_VERSION@";
+
+    public static final String MC_VERSION = "1.12.2";
+    public static final String LOADER = "forge";
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -38,6 +47,9 @@ public class HitSpan {
     public void init(FMLInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(new RangeTracker());
         MinecraftForge.EVENT_BUS.register(new KnockbackTracker());
+        MinecraftForge.EVENT_BUS.register(new CpsTracker());
+        MinecraftForge.EVENT_BUS.register(new UpdateCheckListener());
+
         System.out.println("HitSpan loaded - bewf on top");
     }
 }
