@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/bewf/HitSpan/raw/main/GitAssets/icon4.png" width="400">
+  <img src="https://github.com/bewf/HitSpan/raw/main-1.8.9/GitAssets/icon4.png" width="400">
 </p>
 
 **HitSpan** is a lightweight, client-side HUD mod for Minecraft **1.8.9** and **1.12.2** that displays combat-related information such as:
@@ -16,7 +16,7 @@ If you run into issues or have suggestions, feel free to open an issue on
 ---
 
 <p align="center">
-  <img src="https://github.com/bewf/HitSpan/raw/main/GitAssets/ExampleGifCrop.gif" width="520"><br>
+  <img src="https://github.com/bewf/HitSpan/raw/main-1.8.9/GitAssets/ExampleGifCrop.gif" width="520"><br>
   <sub><em>Example of HitSpan in use.</em></sub>
 </p>
 
@@ -43,7 +43,7 @@ If you run into issues or have suggestions, feel free to open an issue on
 ## OneConfig Integration
 
 <p align="center">
-  <img src="https://cdn.modrinth.com/data/cached_images/8e6cc1e06e776169ada6c760e65fb9d3e2fa6e76.png" width="750"><br>
+  <img src="https://cdn.modrinth.com/data/cached_images/8e6cc1e06e776169ada6c760e65fb9d3e2fa6e76.png" width="900"><br>
   <sub><em>HitSpan is fully configurable through OneConfig.</em></sub>
 </p>
 
