@@ -1,13 +1,15 @@
 {
+  "required": true,
   "compatibilityLevel": "JAVA_8",
-  "minVersion": "0.8",
+  "minVersion": "0.7",
   "package": "me.bewf.hitspan.mixin",
   "refmap": "mixins.hitspan.refmap.json",
-  "injectors": {
-    "maxShiftBy": 5
-  },
+  "injectors": { "maxShiftBy": 5 },
+  "mixins": [
+    "NetHandlerPlayServerMixin"
+  ],
   "client": [
     "NetHandlerPlayClientMixin"
   ],
-  "verbose": false
+  "verbose": true
 }

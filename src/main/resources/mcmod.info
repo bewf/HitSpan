@@ -1,11 +1,16 @@
 [
   {
-    "modid": "hitspan",
-    "name": "HitSpan",
-    "description": "Range + knockback HUD",
-    "logoFile": "assets/hitspan/icon2.png",
-    "version": "1.2.6",
+    "modid": "${mod_id}",
+    "name": "${mod_name}",
+    "description": "HUD for hit range/reach, knockback, and other PvP metrics. OneConfig support.",
+    "version": "${mod_version}",
     "mcversion": "1.8.9",
-    "authorList": ["bewf"]
+    "url": "https://modrinth.com/mod/hitspan",
+    "updateUrl": "https://modrinth.com/mod/hitspan/versions",
+    "authorList": ["bewf"],
+    "credits": "",
+    "logoFile": "assets/hitspan/icon2.png",
+    "screenshots": [],
+    "dependencies": []
   }
 ]

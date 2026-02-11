@@ -1,15 +1,23 @@
+// src/main/java/me/bewf/hitspan/HitSpan.java
 package me.bewf.hitspan;
 
+import me.bewf.hitspan.Knockback.util.KnockbackTracker;
+import me.bewf.hitspan.Range.util.RangeTracker;
+import me.bewf.hitspan.commands.HitSpanCommand;
 import me.bewf.hitspan.config.HitSpanConfig;
+import me.bewf.hitspan.cps.util.CpsTracker;
+import me.bewf.hitspan.util.UpdateCheckListener;
+import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 
 @Mod(
         modid = HitSpan.MODID,
         name = "HitSpan",
-        version = "1.2.6",
+        version = "@MOD_VERSION@",
         acceptedMinecraftVersions = "[1.8.9]",
         clientSideOnly = true,
         acceptableRemoteVersions = "*"
@@ -17,6 +25,10 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 public class HitSpan {
 
     public static final String MODID = "hitspan";
+    public static final String VERSION = "@MOD_VERSION@";
+
+    public static final String MC_VERSION = "1.8.9";
+    public static final String LOADER = "forge";
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -38,6 +50,15 @@ public class HitSpan {
     public void init(FMLInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(new RangeTracker());
         MinecraftForge.EVENT_BUS.register(new KnockbackTracker());
+        MinecraftForge.EVENT_BUS.register(new CpsTracker());
+        MinecraftForge.EVENT_BUS.register(new UpdateCheckListener());
+        MinecraftForge.EVENT_BUS.register(new me.bewf.hitspan.combo.util.ComboTracker());
+
         System.out.println("HitSpan loaded - bewf on top");
+    }
+
+    @Mod.EventHandler
+    public void serverStarting(FMLServerStartingEvent event) {
+        event.registerServerCommand(new HitSpanCommand());
     }
 }

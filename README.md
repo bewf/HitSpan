@@ -7,6 +7,7 @@
 - **Hit range (reach)**
 - **Knockback distance**
 - **CPS**
+- **Combo Counter**
 
 I made this because there were no good alternatives that were accurate, clean, and configurable.
 
@@ -22,7 +23,6 @@ If you run into issues or have suggestions, feel free to open an issue on
 
 ## Features
 
-
 - **Dynamic range tracking**
   - Uses Minecraft’s own ray tracing from the player’s eye position to the target’s hitbox.
   - Green for long-range hits  
@@ -33,6 +33,8 @@ If you run into issues or have suggestions, feel free to open an issue on
   - Measures horizontal knockback over multiple ticks after a hit.
 - **CPS HUD**
   - Displays your clicks per second with configurable averaging and formatting
+- **Combos HUD**
+  - Shows how many times you hit an entity without them hitting you.
 - **OneConfig HUD**
   - Drag, scale, and toggle each HUD element.
   - Integrated with the OneConfig HUD editor.
