@@ -1,6 +1,7 @@
 package me.bewf.hitspan.util;
 
 import me.bewf.hitspan.HitSpan;
+import me.bewf.hitspan.config.HitSpanConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -18,6 +19,12 @@ public final class UpdateCheckListener {
 
         if (started) return;
         started = true;
+
+        // Check if update checker is enabled in config
+        if (HitSpanConfig.INSTANCE != null && !HitSpanConfig.INSTANCE.updateCheckerEnabled) {
+            System.out.println("[HitSpan] Update checker disabled in config");
+            return;
+        }
 
         UpdateChecker.checkOnce(
                 "dDmpgD3L",

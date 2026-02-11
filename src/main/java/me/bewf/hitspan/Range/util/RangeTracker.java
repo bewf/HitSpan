@@ -158,18 +158,19 @@ public class RangeTracker {
 
         HitSpanConfig cfg = HitSpanConfig.INSTANCE;
         if (cfg == null) return;
-        if (!cfg.rangeHudEnabled) return;
 
         if (!(event.target instanceof EntityLivingBase)) return;
-        if (cfg.rangePlayersOnly && !(event.target instanceof EntityPlayer)) return;
-
         EntityLivingBase target = (EntityLivingBase) event.target;
 
+        // Handle knockback tracking independently (not dependent on range tracking)
         if (cfg.knockbackHudEnabled) {
             if (!cfg.knockbackPlayersOnly || target instanceof EntityPlayer) {
                 KnockbackTracker.beginTracking(target);
             }
         }
+
+        if (!cfg.rangeHudEnabled) return;
+        if (cfg.rangePlayersOnly && !(event.target instanceof EntityPlayer)) return;
 
         double maxReach = mc.thePlayer.capabilities.isCreativeMode ? 4.5D : 3.0D;
 
@@ -188,36 +189,35 @@ public class RangeTracker {
             if (cfg.debugEnabled && cfg.debugAttacks) {
                 HitSpanDebug.chat("RANGE immediate id=" + target.getEntityId() + " r=" + fmt(computed));
             }
-            return;
-        }
+        } else {
+            if (pending.size() >= MAX_QUEUE) pending.pollFirst();
 
-        if (pending.size() >= MAX_QUEUE) pending.pollFirst();
+            // Snapshot target bounds at click time (THIS is the important fix)
+            float border = target.getCollisionBorderSize();
+            AxisAlignedBB bb = target.getEntityBoundingBox();
+            AxisAlignedBB bbSnap = new AxisAlignedBB(bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ)
+                    .expand(border, border, border);
 
-        // Snapshot target bounds at click time (THIS is the important fix)
-        float border = target.getCollisionBorderSize();
-        AxisAlignedBB bb = target.getEntityBoundingBox();
-        AxisAlignedBB bbSnap = new AxisAlignedBB(bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ)
-                .expand(border, border, border);
+            PendingHit p = new PendingHit(
+                    target.getEntityId(),
+                    computed,
+                    yaw,
+                    pitch,
+                    maxReach,
+                    bbSnap,
+                    target.hurtTime,
+                    target.hurtResistantTime,
+                    System.currentTimeMillis()
+            );
+            pending.addLast(p);
 
-        PendingHit p = new PendingHit(
-                target.getEntityId(),
-                computed,
-                yaw,
-                pitch,
-                maxReach,
-                bbSnap,
-                target.hurtTime,
-                target.hurtResistantTime,
-                System.currentTimeMillis()
-        );
-        pending.addLast(p);
-
-        if (cfg.debugEnabled && cfg.debugAttacks) {
-            HitSpanDebug.chat("ENQUEUE id=" + p.entityId +
-                    " r=" + fmt(p.range) +
-                    " ht=" + p.prevHurtTime +
-                    " rt=" + p.prevResistTime +
-                    " q=" + pending.size());
+            if (cfg.debugEnabled && cfg.debugAttacks) {
+                HitSpanDebug.chat("ENQUEUE id=" + p.entityId +
+                        " r=" + fmt(p.range) +
+                        " ht=" + p.prevHurtTime +
+                        " rt=" + p.prevResistTime +
+                        " q=" + pending.size());
+            }
         }
     }
 
@@ -235,14 +235,6 @@ public class RangeTracker {
         purgeOldPacketMarks(now);
 
         PendingHit best = pickBestForPacket(entityId, now);
-
-        if (cfg.debugEnabled && cfg.debugPackets) {
-            HitSpanDebug.chat("PACKET id=" + entityId +
-                    " q=" + pending.size() +
-                    " best=" + (best == null ? "null" : ("r=" + fmt(best.range) + " age=" + (now - best.attackTimeMs))));
-            dumpPacketCandidates(entityId, now, best);
-        }
-
         if (best == null) return;
 
         Entity e = mc.theWorld.getEntityByID(entityId);
@@ -252,16 +244,8 @@ public class RangeTracker {
         }
 
         double confirmedRange = recomputeFromSnapshot(best);
-
-        if (cfg.debugEnabled && cfg.debugConfirms) {
-            HitSpanDebug.chat("CONFIRM packet id=" + entityId + " r=" + fmt(confirmedRange));
-        }
-
         confirmValue(confirmedRange);
         lastPacketConfirmMs.put(entityId, now);
-
-        HitSpanDebug.rangeServerCompare(entityId, confirmedRange, "packet", best.attackTimeMs);
-
         purgeEntity(entityId);
     }
 

@@ -2,7 +2,7 @@
   {
     "modid": "${mod_id}",
     "name": "${mod_name}",
-    "description": "Client-side HUD mod for hit range/reach and knockback.",
+    "description": "HUD for hit range/reach, knockback, and other PvP metrics. OneConfig support.",
     "version": "${mod_version}",
     "mcversion": "1.8.9",
     "url": "https://modrinth.com/mod/hitspan",
