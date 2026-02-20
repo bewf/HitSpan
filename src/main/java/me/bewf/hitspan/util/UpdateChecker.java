@@ -53,6 +53,7 @@ public final class UpdateChecker {
                 Minecraft.getMinecraft().addScheduledTask(() -> {
                     if (Minecraft.getMinecraft().thePlayer == null) return;
                     Minecraft.getMinecraft().thePlayer.addChatMessage(buildMessage(projectSlug, displayName, latest, currentVersion));
+                    NotificationManager.showUpdateNotificationWithConfigTip();
                 });
 
                 System.out.println("[" + displayName + "] Update check: " + latest + " available (current " + currentVersion + ")");

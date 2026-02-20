@@ -6,6 +6,10 @@ import me.bewf.hitspan.config.HitSpanConfig;
 import me.bewf.hitspan.util.UpdateChecker;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.event.ClickEvent;
+import net.minecraft.event.HoverEvent;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumChatFormatting;
 
 public class HitSpanCommand extends CommandBase {
@@ -24,7 +28,25 @@ public class HitSpanCommand extends CommandBase {
     public void processCommand(ICommandSender sender, String[] args) {
         if (args.length == 0) {
             UChat.chat(EnumChatFormatting.AQUA + "[HitSpan] " + EnumChatFormatting.GOLD + "Available commands:");
-            UChat.chat(EnumChatFormatting.DARK_GRAY + " < " + EnumChatFormatting.GRAY + "disableupdate" + EnumChatFormatting.DARK_GRAY + " | " + EnumChatFormatting.GRAY + "enableupdate" + EnumChatFormatting.DARK_GRAY + " | " + EnumChatFormatting.GRAY + "checkupdate" + EnumChatFormatting.DARK_GRAY + " >");
+            
+            // Create command components with hover info
+            ChatComponentText disableCmd = new ChatComponentText(EnumChatFormatting.GRAY + "disableupdate");
+            ChatComponentText enableCmd = new ChatComponentText(EnumChatFormatting.GRAY + "enableupdate");
+            ChatComponentText checkCmd = new ChatComponentText(EnumChatFormatting.GRAY + "checkupdate");
+            
+            // Add hover text for checkupdate command
+            checkCmd.getChatStyle().setChatHoverEvent(new HoverEvent(
+                HoverEvent.Action.SHOW_TEXT,
+                new ChatComponentText(EnumChatFormatting.LIGHT_PURPLE + "Manually check for updates")
+            ));
+            
+            UChat.chat(EnumChatFormatting.DARK_GRAY + " < " + 
+                      disableCmd.getFormattedText() + 
+                      EnumChatFormatting.DARK_GRAY + " | " + 
+                      enableCmd.getFormattedText() + 
+                      EnumChatFormatting.DARK_GRAY + " | " + 
+                      checkCmd.getFormattedText() + 
+                      EnumChatFormatting.DARK_GRAY + " >");
             return;
         }
 
@@ -86,7 +108,25 @@ public class HitSpanCommand extends CommandBase {
                 
             default:
                 UChat.chat(EnumChatFormatting.AQUA + "[HitSpan] " + EnumChatFormatting.GOLD + "Available commands:");
-                UChat.chat(EnumChatFormatting.DARK_GRAY + " < " + EnumChatFormatting.GRAY + "disableupdate" + EnumChatFormatting.DARK_GRAY + " | " + EnumChatFormatting.GRAY + "enableupdate" + EnumChatFormatting.DARK_GRAY + " | " + EnumChatFormatting.GRAY + "checkupdate" + EnumChatFormatting.DARK_GRAY + " >");
+                
+                // Create command components with hover info
+                ChatComponentText disableCmd = new ChatComponentText(EnumChatFormatting.GRAY + "disableupdate");
+                ChatComponentText enableCmd = new ChatComponentText(EnumChatFormatting.GRAY + "enableupdate");
+                ChatComponentText checkCmd = new ChatComponentText(EnumChatFormatting.GRAY + "checkupdate");
+                
+                // Add hover text for checkupdate command
+                checkCmd.getChatStyle().setChatHoverEvent(new HoverEvent(
+                    HoverEvent.Action.SHOW_TEXT,
+                    new ChatComponentText(EnumChatFormatting.LIGHT_PURPLE + "Manually check for updates")
+                ));
+                
+                UChat.chat(EnumChatFormatting.DARK_GRAY + " < " + 
+                          disableCmd.getFormattedText() + 
+                          EnumChatFormatting.DARK_GRAY + " | " + 
+                          enableCmd.getFormattedText() + 
+                          EnumChatFormatting.DARK_GRAY + " | " + 
+                          checkCmd.getFormattedText() + 
+                          EnumChatFormatting.DARK_GRAY + " >");
                 break;
         }
     }

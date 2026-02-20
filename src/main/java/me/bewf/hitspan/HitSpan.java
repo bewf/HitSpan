@@ -12,7 +12,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 
 @Mod(
         modid = HitSpan.MODID,
@@ -54,11 +53,9 @@ public class HitSpan {
         MinecraftForge.EVENT_BUS.register(new UpdateCheckListener());
         MinecraftForge.EVENT_BUS.register(new me.bewf.hitspan.combo.util.ComboTracker());
 
-        System.out.println("HitSpan loaded - bewf on top");
-    }
+        // Register client command
+        ClientCommandHandler.instance.registerCommand(new HitSpanCommand());
 
-    @Mod.EventHandler
-    public void serverStarting(FMLServerStartingEvent event) {
-        event.registerServerCommand(new HitSpanCommand());
+        System.out.println("HitSpan loaded - bewf on top");
     }
 }

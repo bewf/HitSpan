@@ -184,13 +184,14 @@ public class HitSpanConfig extends Config {
 
     public boolean comboHudEnabled = true;
 
-    @Checkbox(
-            name = "Hide on Zero",
-            description = "Hide the Combo HUD when combo is zero",
+    @Number(
+            name = "Hide Under",
+            description = "Hide the Combo HUD when combo is under this value. Set to 0 to always show.",
+            min = 0, max = 100,
             category = "Combo",
             subcategory = "General"
     )
-    public boolean comboHideOnZero = true;
+    public int comboHideUnder = 3;
 
     @Text(
             name = "Label",
@@ -340,6 +341,9 @@ public class HitSpanConfig extends Config {
             subcategory = "Updates"
     )
     public boolean updateCheckerEnabled = true;
+
+    // Internal flag to track if config tip has been shown (hidden from UI)
+    public boolean hasShownConfigTip = false;
 
     private HitSpanConfig() {
         super(

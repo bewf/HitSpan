@@ -28,8 +28,8 @@ public class ComboHud extends TextHud {
 
         int val = ComboTracker.combo;
 
-        // Hide HUD if combo is zero and option is enabled
-        if (cfg.comboHideOnZero && val == 0) return;
+        // Hide HUD if combo is under the threshold
+        if (cfg.comboHideUnder > 0 && val < cfg.comboHideUnder) return;
 
         // After 10 seconds without hits, reset to 0
         long now = System.currentTimeMillis();
