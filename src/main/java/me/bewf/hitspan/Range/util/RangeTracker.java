@@ -11,6 +11,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
+import net.minecraft.potion.Potion;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -24,6 +25,9 @@ import java.util.Set;
 public class RangeTracker {
 
     private final Minecraft mc = Minecraft.getMinecraft();
+
+    // Threshold to consider a queued click vulnerable to fall damage at click time
+    private static final float FALL_DAMAGE_THRESHOLD = 3.0f;
 
     public static double lastRange = -1;
     public static long lastRangeTimeMs = 0;
@@ -128,6 +132,16 @@ public class RangeTracker {
                 newest.baselineHealth = hp;
             } else {
                 if (hp + 0.001f < newest.baselineHealth) {
+                    // If the target had an ongoing environmental damage source at click time,
+                    // skip a pure health-based confirm since it's ambiguous (fire/poison/wither/fall).
+                    if (newest.prevBurning || newest.prevPoisoned || newest.prevWither || newest.prevFallDistance > FALL_DAMAGE_THRESHOLD) {
+                        if (cfg.debugEnabled && cfg.debugConfirms) {
+                            HitSpanDebug.chat("SKIP health confirm (env damage snapshot) id=" + entityId);
+                        }
+                        // Let hurt/resist fallback or packet confirms handle it instead
+                        continue;
+                    }
+
                     double confirmedRange = recomputeFromSnapshot(newest);
 
                     if (cfg.debugEnabled && cfg.debugConfirms) {
@@ -195,6 +209,12 @@ public class RangeTracker {
             AxisAlignedBB bbSnap = new AxisAlignedBB(bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ)
                     .expand(border, border, border);
 
+            // Snapshot environmental statuses at click time to avoid attributing later env damage.
+            boolean prevBurning = target.isBurning();
+            boolean prevPoisoned = target.isPotionActive(Potion.poison);
+            boolean prevWither = target.isPotionActive(Potion.wither);
+            float prevFallDistance = target.fallDistance;
+
             PendingHit p = new PendingHit(
                     target.getEntityId(),
                     computed,
@@ -204,6 +224,10 @@ public class RangeTracker {
                     bbSnap,
                     target.hurtTime,
                     target.hurtResistantTime,
+                    prevBurning,
+                    prevPoisoned,
+                    prevWither,
+                    prevFallDistance,
                     System.currentTimeMillis()
             );
             pending.addLast(p);
@@ -213,6 +237,10 @@ public class RangeTracker {
                         " r=" + fmt(p.range) +
                         " ht=" + p.prevHurtTime +
                         " rt=" + p.prevResistTime +
+                        " burn=" + p.prevBurning +
+                        " poison=" + p.prevPoisoned +
+                        " wither=" + p.prevWither +
+                        " fall=" + p.prevFallDistance +
                         " q=" + pending.size());
             }
         }
@@ -486,6 +514,10 @@ public class RangeTracker {
 
         final int prevHurtTime;
         final int prevResistTime;
+        final boolean prevBurning;
+        final boolean prevPoisoned;
+        final boolean prevWither;
+        final float prevFallDistance;
         final long attackTimeMs;
 
         float baselineHealth = Float.NaN;
@@ -498,6 +530,10 @@ public class RangeTracker {
                    AxisAlignedBB bbSnap,
                    int prevHurtTime,
                    int prevResistTime,
+                   boolean prevBurning,
+                   boolean prevPoisoned,
+                   boolean prevWither,
+                   float prevFallDistance,
                    long attackTimeMs) {
             this.entityId = entityId;
             this.range = range;
@@ -507,6 +543,10 @@ public class RangeTracker {
             this.bbSnap = bbSnap;
             this.prevHurtTime = prevHurtTime;
             this.prevResistTime = prevResistTime;
+            this.prevBurning = prevBurning;
+            this.prevPoisoned = prevPoisoned;
+            this.prevWither = prevWither;
+            this.prevFallDistance = prevFallDistance;
             this.attackTimeMs = attackTimeMs;
         }
     }

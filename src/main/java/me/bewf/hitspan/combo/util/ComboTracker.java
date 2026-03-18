@@ -51,6 +51,7 @@ public class ComboTracker {
 
     private static final int MAX_QUEUE = 60;
     private static final long CONFIRM_WINDOW_MS = 1200L;
+    private static final float FALL_DAMAGE_THRESHOLD = 3.0f;
 
     // Packet / fallback tuning
     private static final long PACKET_WAIT_MS = 120L;
@@ -130,6 +131,11 @@ public class ComboTracker {
                 newest.baselineHealth = hp;
             } else {
                 if (hp + 0.001f < newest.baselineHealth) {
+                    // Skip pure health confirms if the target had ongoing environmental damage at click
+                    if (newest.prevBurning || newest.prevPoisoned || newest.prevWither || newest.prevFallDistance > FALL_DAMAGE_THRESHOLD) {
+                        continue;
+                    }
+
                     confirmHit(newest.target);
                     HitSpanDebug.chat("CONFIRM health id=" + entityId +
                             " hp " + newest.baselineHealth + "->" + hp);
@@ -167,11 +173,20 @@ public class ComboTracker {
         AxisAlignedBB bbSnap = new AxisAlignedBB(bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ)
                 .expand(border, border, border);
 
+        boolean prevBurning = target.isBurning();
+        boolean prevPoisoned = target.isPotionActive(net.minecraft.potion.Potion.poison);
+        boolean prevWither = target.isPotionActive(net.minecraft.potion.Potion.wither);
+        float prevFallDistance = target.fallDistance;
+
         PendingHit p = new PendingHit(
                 target.getEntityId(),
                 target,
                 target.hurtTime,
                 target.hurtResistantTime,
+                prevBurning,
+                prevPoisoned,
+                prevWither,
+                prevFallDistance,
                 System.currentTimeMillis()
         );
         pending.addLast(p);
@@ -369,6 +384,10 @@ public class ComboTracker {
         final Entity target;
         final int prevHurtTime;
         final int prevResistTime;
+        final boolean prevBurning;
+        final boolean prevPoisoned;
+        final boolean prevWither;
+        final float prevFallDistance;
         final long attackTimeMs;
 
         float baselineHealth = Float.NaN;
@@ -377,11 +396,19 @@ public class ComboTracker {
                    Entity target,
                    int prevHurtTime,
                    int prevResistTime,
+                   boolean prevBurning,
+                   boolean prevPoisoned,
+                   boolean prevWither,
+                   float prevFallDistance,
                    long attackTimeMs) {
             this.entityId = entityId;
             this.target = target;
             this.prevHurtTime = prevHurtTime;
             this.prevResistTime = prevResistTime;
+            this.prevBurning = prevBurning;
+            this.prevPoisoned = prevPoisoned;
+            this.prevWither = prevWither;
+            this.prevFallDistance = prevFallDistance;
             this.attackTimeMs = attackTimeMs;
         }
     }
