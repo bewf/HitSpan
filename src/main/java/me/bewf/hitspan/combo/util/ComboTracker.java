@@ -103,19 +103,6 @@ public class ComboTracker {
 
             float hp = t.getHealth();
 
-            // 1) Health confirm
-            if (Float.isNaN(newest.baselineHealth)) {
-                newest.baselineHealth = hp;
-            } else {
-                if (hp + 0.001f < newest.baselineHealth) {
-                    confirmHit(newest.target);
-                    HitSpanDebug.chat("CONFIRM health id=" + entityId +
-                            " hp " + newest.baselineHealth + "->" + hp);
-                    purgeEntity(entityId);
-                    continue;
-                }
-            }
-
             // Packet grace
             Long lastPkt = lastPacketConfirmMs.get(entityId);
             if (lastPkt != null && now - lastPkt < PACKET_GRACE_MS) {
@@ -127,7 +114,7 @@ public class ComboTracker {
                 continue;
             }
 
-            // 2) Hurt/Resist fallback
+            // 2) Hurt/Resist fallback (check BEFORE health confirm)
             PendingHit fb = pickBestFallbackCandidate(entityId, now, t);
             if (fb != null) {
                 confirmHit(fb.target);
@@ -136,6 +123,19 @@ public class ComboTracker {
                         " rt=" + t.hurtResistantTime + "/" + fb.prevResistTime);
                 purgeEntity(entityId);
                 continue;
+            }
+
+            // 1) Health confirm (run after hurt/resist fallback)
+            if (Float.isNaN(newest.baselineHealth)) {
+                newest.baselineHealth = hp;
+            } else {
+                if (hp + 0.001f < newest.baselineHealth) {
+                    confirmHit(newest.target);
+                    HitSpanDebug.chat("CONFIRM health id=" + entityId +
+                            " hp " + newest.baselineHealth + "->" + hp);
+                    purgeEntity(entityId);
+                    continue;
+                }
             }
         }
 

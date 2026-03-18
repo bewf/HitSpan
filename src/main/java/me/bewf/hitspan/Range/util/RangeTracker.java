@@ -45,6 +45,11 @@ public class RangeTracker {
 
     private static final long PACKET_MATCH_WINDOW_MS = 250L;
 
+    // Health confirm attribution window: only attribute a health drop to
+    // a queued attack if it happens within this many milliseconds of the
+    // attack timestamp. This filters out environmental or delayed damage.
+    private static final long HEALTH_CONFIRM_WINDOW_MS = 400L;
+
     private final ArrayDeque<PendingHit> pending = new ArrayDeque<>(MAX_QUEUE);
     private final HashMap<Integer, Long> lastPacketConfirmMs = new HashMap<Integer, Long>();
 
@@ -81,26 +86,6 @@ public class RangeTracker {
 
             float hp = t.getHealth();
 
-            // 1) Health confirm
-            if (Float.isNaN(newest.baselineHealth)) {
-                newest.baselineHealth = hp;
-            } else {
-                if (hp + 0.001f < newest.baselineHealth) {
-                    double confirmedRange = recomputeFromSnapshot(newest);
-
-                    if (cfg.debugEnabled && cfg.debugConfirms) {
-                        HitSpanDebug.chat("CONFIRM health id=" + entityId +
-                                " r=" + fmt(confirmedRange) +
-                                " hp " + newest.baselineHealth + "->" + hp);
-                    }
-
-                    confirmValue(confirmedRange);
-                    HitSpanDebug.rangeServerCompare(entityId, confirmedRange, "health", newest.attackTimeMs);
-                    purgeEntity(entityId);
-                    continue;
-                }
-            }
-
             // Packet grace
             Long lastPkt = lastPacketConfirmMs.get(entityId);
             if (lastPkt != null && now - lastPkt < PACKET_GRACE_MS) {
@@ -120,7 +105,7 @@ public class RangeTracker {
                 continue;
             }
 
-            // 2) Hurt/Resist fallback
+            // 2) Hurt/Resist fallback (check BEFORE health confirm)
             PendingHit fb = pickBestFallbackCandidate(entityId, now, t);
             if (fb != null) {
                 double confirmedRange = recomputeFromSnapshot(fb);
@@ -138,12 +123,24 @@ public class RangeTracker {
                 continue;
             }
 
-            if (cfg.debugEnabled && cfg.debugVerbose) {
-                HitSpanDebug.chatVerbose("check id=" + entityId +
-                        " bestAge=" + (now - newest.attackTimeMs) +
-                        " ht=" + t.hurtTime + "/" + newest.prevHurtTime +
-                        " rt=" + t.hurtResistantTime + "/" + newest.prevResistTime +
-                        " hp=" + hp + "/" + newest.baselineHealth);
+            // 1) Health confirm (run after hurt/resist fallback)
+            if (Float.isNaN(newest.baselineHealth)) {
+                newest.baselineHealth = hp;
+            } else {
+                if (hp + 0.001f < newest.baselineHealth) {
+                    double confirmedRange = recomputeFromSnapshot(newest);
+
+                    if (cfg.debugEnabled && cfg.debugConfirms) {
+                        HitSpanDebug.chat("CONFIRM health id=" + entityId +
+                                " r=" + fmt(confirmedRange) +
+                                " hp " + newest.baselineHealth + "->" + hp);
+                    }
+
+                    confirmValue(confirmedRange);
+                    HitSpanDebug.rangeServerCompare(entityId, confirmedRange, "health", newest.attackTimeMs);
+                    purgeEntity(entityId);
+                    continue;
+                }
             }
         }
     }
@@ -327,6 +324,46 @@ public class RangeTracker {
     }
 
     // -------------------------
+    // Helpers
+    // -------------------------
+
+    private void purgeStale(long now) {
+        Iterator<PendingHit> it = pending.iterator();
+        while (it.hasNext()) {
+            PendingHit p = it.next();
+            if (now - p.attackTimeMs > CONFIRM_WINDOW_MS) it.remove();
+        }
+    }
+
+    private void purgeOldPacketMarks(long now) {
+        Iterator<Integer> it = lastPacketConfirmMs.keySet().iterator();
+        while (it.hasNext()) {
+            Integer id = it.next();
+            Long t = lastPacketConfirmMs.get(id);
+            if (t == null) { it.remove(); continue; }
+            if (now - t > 5000L) it.remove();
+        }
+    }
+
+    private Set<Integer> collectEntityIds() {
+        Set<Integer> ids = new HashSet<Integer>();
+        for (PendingHit p : pending) ids.add(p.entityId);
+        return ids;
+    }
+
+    private void purgeEntity(int entityId) {
+        Iterator<PendingHit> it = pending.iterator();
+        while (it.hasNext()) {
+            if (it.next().entityId == entityId) it.remove();
+        }
+    }
+
+    private void confirmValue(double r) {
+        lastRange = r;
+        lastRangeTimeMs = System.currentTimeMillis();
+    }
+
+    // -------------------------
     // Debug helpers
     // -------------------------
 
@@ -416,49 +453,6 @@ public class RangeTracker {
         if (hit == null || hit.hitVec == null) return -1;
 
         return hit.hitVec.distanceTo(eyes);
-    }
-
-    // -------------------------
-    // Helpers
-    // -------------------------
-
-    private void confirmValue(double range) {
-        lastRange = range;
-        lastRangeTimeMs = System.currentTimeMillis();
-    }
-
-    private void purgeStale(long now) {
-        Iterator<PendingHit> it = pending.iterator();
-        while (it.hasNext()) {
-            PendingHit p = it.next();
-            if (now - p.attackTimeMs > CONFIRM_WINDOW_MS) it.remove();
-        }
-    }
-
-    private void purgeOldPacketMarks(long now) {
-        Iterator<Integer> it = lastPacketConfirmMs.keySet().iterator();
-        while (it.hasNext()) {
-            Integer id = it.next();
-            Long t = lastPacketConfirmMs.get(id);
-            if (t == null) {
-                it.remove();
-                continue;
-            }
-            if (now - t > 5000L) it.remove();
-        }
-    }
-
-    private Set<Integer> collectEntityIds() {
-        Set<Integer> ids = new HashSet<Integer>();
-        for (PendingHit p : pending) ids.add(p.entityId);
-        return ids;
-    }
-
-    private void purgeEntity(int entityId) {
-        Iterator<PendingHit> it = pending.iterator();
-        while (it.hasNext()) {
-            if (it.next().entityId == entityId) it.remove();
-        }
     }
 
     private static double computeEntityRayDistance(EntityLivingBase player, Entity target, float partialTicks, double maxDist) {
