@@ -20,8 +20,14 @@ public class CpsTracker {
     private static final ArrayDeque<Long> leftClicks = new ArrayDeque<>();
     private static final ArrayDeque<Long> rightClicks = new ArrayDeque<>();
 
-    private static final ArrayDeque<Integer> leftSamples = new ArrayDeque<>();
-    private static final ArrayDeque<Integer> rightSamples = new ArrayDeque<>();
+    // Previously we kept fixed-size sample buffers here. Those produced
+    // abrupt jumps when the buffer filled or was cleared. Replace with
+    // a lightweight exponential moving average (EMA) to smooth values
+    // continuously.
+    private static float emaLeft = 0f;
+    private static float emaRight = 0f;
+    private static boolean emaInitLeft = false;
+    private static boolean emaInitRight = false;
 
     private static boolean leftPressed = false;
     private static boolean rightPressed = false;
@@ -53,14 +59,57 @@ public class CpsTracker {
         int lRaw = leftClicks.size();
         int rRaw = rightClicks.size();
 
-        if (lRaw == 0) leftSamples.clear();
-        if (rRaw == 0) rightSamples.clear();
+        // Update EMA smoothing. The configured cpsAverageSeconds controls
+        // how "wide" the smoothing window is. We derive an alpha from the
+        // desired window so that the EMA responds gradually instead of
+        // jumping when a buffer fills or clears. Use asymmetric multipliers
+        // so rises and falls react faster than a symmetric EMA would.
+        HitSpanConfig cfg = HitSpanConfig.INSTANCE;
+        int seconds = (cfg == null) ? 1 : cfg.cpsAverageSeconds;
 
-        leftSamples.addLast(lRaw);
-        rightSamples.addLast(rRaw);
+        if (seconds <= 1) {
+            // No smoothing: keep EMA synced to raw so getters will return raw.
+            emaLeft = lRaw;
+            emaRight = rRaw;
+            emaInitLeft = emaInitRight = true;
+        } else {
+            // base alpha = dt / window
+            float baseAlpha = (float) SAMPLE_EVERY_MS / (seconds * 1000f);
+            // multipliers: make rise respond quicker and make fall respond even quicker
+            final float RISE_MULT = 3.5f;
+            final float FALL_MULT = 8.0f;
+            // clamp baseAlpha to avoid degenerate tiny values
+            baseAlpha = Math.max(0.005f, Math.min(1f, baseAlpha));
 
-        pruneSamples(leftSamples);
-        pruneSamples(rightSamples);
+            // Left
+            if (!emaInitLeft) {
+                // Only seed EMA when we actually see activity (avoid bias from idle zeros)
+                if (lRaw > 0) {
+                    emaLeft = lRaw;
+                    emaInitLeft = true;
+                }
+            } else {
+                float alpha = baseAlpha * (lRaw > emaLeft ? RISE_MULT : FALL_MULT);
+                alpha = Math.max(0.01f, Math.min(1f, alpha));
+                emaLeft += alpha * (lRaw - emaLeft);
+                // Snap small lingering values to zero for a cleaner display when idle
+                // Use a slightly higher threshold so tiny 1-2 CPS blips don't linger.
+                if (lRaw == 0 && emaLeft < 1.5f) emaLeft = 0f;
+            }
+
+            // Right
+            if (!emaInitRight) {
+                if (rRaw > 0) {
+                    emaRight = rRaw;
+                    emaInitRight = true;
+                }
+            } else {
+                float alpha = baseAlpha * (rRaw > emaRight ? RISE_MULT : FALL_MULT);
+                alpha = Math.max(0.01f, Math.min(1f, alpha));
+                emaRight += alpha * (rRaw - emaRight);
+                if (rRaw == 0 && emaRight < 1.5f) emaRight = 0f;
+            }
+        }
     }
 
     private static void recordEdges() {
@@ -92,11 +141,16 @@ public class CpsTracker {
     }
 
     public static float getLeftCpsFloat() {
-        return applySmoothing(rawLeft(), leftSamples);
+        HitSpanConfig cfg = HitSpanConfig.INSTANCE;
+        if (cfg == null || cfg.cpsAverageSeconds <= 1) return rawLeft();
+        // If EMA hasn't been initialized yet return raw as a fallback.
+        return emaInitLeft ? emaLeft : rawLeft();
     }
 
     public static float getRightCpsFloat() {
-        return applySmoothing(rawRight(), rightSamples);
+        HitSpanConfig cfg = HitSpanConfig.INSTANCE;
+        if (cfg == null || cfg.cpsAverageSeconds <= 1) return rawRight();
+        return emaInitRight ? emaRight : rawRight();
     }
 
     /* ===== Internals ===== */
@@ -111,40 +165,12 @@ public class CpsTracker {
         return rightClicks.size();
     }
 
-    private static float applySmoothing(int raw, ArrayDeque<Integer> samples) {
-        HitSpanConfig cfg = HitSpanConfig.INSTANCE;
-        if (cfg == null) return raw;
-
-        int seconds = cfg.cpsAverageSeconds;
-        if (seconds <= 1) return raw;
-
-        int warmupSamples = 1000 / (int) SAMPLE_EVERY_MS;
-        int maxSamples = (seconds * 1000) / (int) SAMPLE_EVERY_MS;
-
-        if (samples.size() < warmupSamples) return raw;
-        if (samples.size() < maxSamples) return raw;
-
-        int sum = 0;
-        for (int v : samples) sum += v;
-        return (float) sum / samples.size();
-    }
+    // Smoothing is handled by the EMA updated in onClientTick.
 
     private static void pruneRaw(ArrayDeque<Long> deque) {
         long now = System.currentTimeMillis();
         while (!deque.isEmpty() && now - deque.peekFirst() > RAW_WINDOW_MS) {
             deque.pollFirst();
-        }
-    }
-
-    private static void pruneSamples(ArrayDeque<Integer> samples) {
-        HitSpanConfig cfg = HitSpanConfig.INSTANCE;
-        if (cfg == null) return;
-
-        int seconds = Math.max(1, Math.min(5, cfg.cpsAverageSeconds));
-        int maxSamples = (seconds * 1000) / (int) SAMPLE_EVERY_MS;
-
-        while (samples.size() > maxSamples) {
-            samples.pollFirst();
         }
     }
 }
