@@ -21,15 +21,7 @@ If you run into issues or have suggestions, feel free to open an issue on
   <sub><em>Example of HitSpan in use.</em></sub>
 </p>
 
-## Repository layout
 
-| Folder | Loader | Minecraft | Version |
-| --- | --- | --- | --- |
-| `forge-1.8.9` | Forge | 1.8.9 | 1.3.5 |
-| `forge-1.12.2` | Forge | 1.12.2 | 1.3.2 |
-| `fabric-1.8.9` | Fabric (Ornithe) | 1.8.9 | 1.4.0 |
-
-Each folder is a standalone Gradle project. Run `./gradlew build` inside the folder you want.
 
 ## Features
 
