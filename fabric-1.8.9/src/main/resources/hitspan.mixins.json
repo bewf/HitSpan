@@ -1,0 +1,14 @@
+{
+	"required": true,
+	"package": "me.bewf.hitspan.mixin",
+	"compatibilityLevel": "JAVA_8",
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"client": [
+		"ClientPlayNetworkHandlerMixin",
+		"ServerPlayNetworkHandlerMixin",
+		"MultiPlayerGameModeMixin",
+		"LivingEntityMixin"
+	]
+}

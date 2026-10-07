@@ -1,0 +1,29 @@
+{
+	"schemaVersion": 1,
+	"id": "hitspan",
+	"version": "${version}",
+	"name": "HitSpan",
+	"description": "HUD for hit range/reach, knockback, and other PvP metrics. OneConfig support.",
+	"authors": [
+		"bewf"
+	],
+	"contact": {
+		"homepage": "https://modrinth.com/mod/hitspan"
+	},
+	"license": "LicenseRef-All-Rights-Reserved",
+	"icon": "assets/hitspan/icon2.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"me.bewf.hitspan.HitSpanClient"
+		]
+	},
+	"mixins": [
+		"hitspan.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "1.8.9",
+		"oneconfigv1": "*"
+	}
+}
