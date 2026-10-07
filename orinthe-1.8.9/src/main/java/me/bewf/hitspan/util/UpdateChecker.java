@@ -63,7 +63,7 @@ public final class UpdateChecker {
 
     private static String fetchBestLatestVersion(String projectId, String mcVersion, String loader) throws Exception {
         String gv = "[\"" + mcVersion + "\"]";
-        String ld = "[\"" + loader + "\"]";
+        String ld = "[\"" + loader + "\"" + (loader.equals("fabric") ? "" : ",\"fabric\"") + "]";
 
         String apiUrl =
                 "https://api.modrinth.com/v2/project/" + projectId + "/version" +
