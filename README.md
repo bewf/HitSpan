@@ -1,7 +1,7 @@
 
 
 <p align="center">
-  <img src="https://github.com/bewf/HitSpan/raw/main-1.8.9/GitAssets/icon4.png" width="400">
+  <img src="https://github.com/bewf/HitSpan/raw/multicore/GitAssets/icon4.png" width="400">
 </p>
 
 <p align="center">
@@ -28,7 +28,7 @@ If you run into issues or have suggestions, feel free to open an issue on  [GitH
 ---
 
 <p align="center">
-  <img src="https://github.com/bewf/HitSpan/raw/main-1.8.9/GitAssets/ExampleGifCrop.gif" width="520"><br>
+  <img src="https://github.com/bewf/HitSpan/raw/multicore/GitAssets/ExampleGifCrop.gif" width="520"><br>
   <sub><em>Example of HitSpan in use.</em></sub>
 </p>
 
