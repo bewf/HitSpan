@@ -1,12 +1,14 @@
+
+
 <p align="center">
   <img src="https://github.com/bewf/HitSpan/raw/main-1.8.9/GitAssets/icon4.png" width="400">
 </p>
+
 <p align="center">
   <a href="https://modrinth.com/mod/hitspan/versions?l=fabric"><img src="https://github.com/bewf/HitSpan/raw/multicore/GitAssets/available-fabric.png" height="44" alt="Available for Fabric"></a>
   <a href="https://modrinth.com/mod/hitspan/versions?l=forge"><img src="https://github.com/bewf/HitSpan/raw/multicore/GitAssets/available-forge.png" height="44" alt="Available for Forge"></a>
   <a href="https://modrinth.com/mod/hitspan/versions?l=ornithe"><img src="https://github.com/bewf/HitSpan/raw/multicore/GitAssets/available-ornithe.png" height="44" alt="Available for Ornithe"></a>
 </p>
-
 **HitSpan** is a lightweight, client-side combat HUD mod for Minecraft that shows:
 
 - **Hit range (reach)**
@@ -16,8 +18,10 @@
 
 I made this because there were no alternatives for 1.8.9 that I liked.
 
-If you run into issues or have suggestions, feel free to open an issue on  
-[GitHub](https://github.com/bewf/HitSpan/issues)
+If you run into issues or have suggestions, feel free to open an issue on  [GitHub](https://github.com/bewf/HitSpan/issues)
+
+
+
 
 ---
 
