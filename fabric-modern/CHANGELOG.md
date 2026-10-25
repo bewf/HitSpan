@@ -1,0 +1,12 @@
+## 1.4.1
+- Port to Minecraft 26.1.2, 26.2 and 26.3 on Fabric, plus 1.21.1 through 1.21.11
+- Hit confirmation now reads who caused the damage from the damage packet: only damage caused by you confirms Range and Combo, and damage from anyone else is ignored
+- Hurt animation and the old hurt time / health check stay as fallbacks for servers that do not send the damage packet
+- Hurt animation packets are ignored while the server is sending damage packets
+- Range uses the distance measured at the moment of the attack (the old recompute step never changed the result)
+- CPS counts clicks from your attack and use keybinds instead of raw mouse buttons, and only while in a world
+- Trackers clear their state when you leave a world
+- HUDs start at staggered positions instead of stacking on top of each other
+- CPS Hide on Zero is now on by default
+- Update check: /hitspan checkupdate only says up to date when no update message was sent
+- Debug settings unchanged; all HUD settings stay on the HUDs
