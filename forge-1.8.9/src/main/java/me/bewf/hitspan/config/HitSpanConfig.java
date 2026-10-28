@@ -238,7 +238,7 @@ public class HitSpanConfig extends Config {
             category = "CPS",
             subcategory = "General"
     )
-    public boolean cpsHideOnZero = false;
+    public boolean cpsHideOnZero = true;
 
     @Text(
             name = "Label",

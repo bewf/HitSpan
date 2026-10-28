@@ -51,6 +51,7 @@ public class HitSpan {
         MinecraftForge.EVENT_BUS.register(new KnockbackTracker());
         MinecraftForge.EVENT_BUS.register(new CpsTracker());
         MinecraftForge.EVENT_BUS.register(new UpdateCheckListener());
+        MinecraftForge.EVENT_BUS.register(new me.bewf.hitspan.util.WorldLeaveListener());
         MinecraftForge.EVENT_BUS.register(new me.bewf.hitspan.combo.util.ComboTracker());
 
         // Register client command

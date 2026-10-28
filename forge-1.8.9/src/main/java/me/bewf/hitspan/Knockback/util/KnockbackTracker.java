@@ -30,6 +30,17 @@ public class KnockbackTracker {
     private static final double MIN_KB_EPS = 0.02D;
     private static final double CONE_COS_MIN = 0.60D;
 
+    /** Clears all state (called when leaving a world). */
+    public static void reset() {
+        lastKB = -1;
+        lastKBTimeMs = 0;
+        trackingEntityId = -1;
+        ticksLeft = 0;
+        maxConeDisp = 0;
+        lastBeginEntityId = -1;
+        lastBeginTimeMs = 0;
+    }
+
     public static void beginTracking(EntityLivingBase target) {
         HitSpanConfig cfg = HitSpanConfig.INSTANCE;
         if (cfg == null || !cfg.knockbackHudEnabled) return;

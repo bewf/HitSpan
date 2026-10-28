@@ -14,7 +14,7 @@ public class RangeHud extends TextHud {
     private static final transient DecimalFormat DF = new DecimalFormat("0.00");
 
     public RangeHud() {
-        super(true);
+        super(true, 20, 20); // staggered default position
     }
 
     @Override

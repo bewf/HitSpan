@@ -24,22 +24,11 @@ group = modGroup
 version = modVersion
 
 toolkitLoomHelper {
-    useOneConfig {
-        version = "1.0.0-alpha.106"
-        loaderVersion = "1.1.0-alpha.46"
-
-        usePolyMixin = true
-        polyMixinVersion = "0.8.4+build.2"
-
-        applyLoaderTweaker = false
-
-        for (module in arrayOf("commands", "config", "config-impl", "events", "hud", "internal", "ui", "utils")) {
-            +module
-        }
-    }
+    // OneConfig V0 (cc.polyfrost) is declared manually in `dependencies` below.
+    // Do NOT call useOneConfig {} here: that is the V1 integration and requests
+    // org.polyfrost.oneconfig:<mc>-forge:<ver>, which is not published for legacy Forge.
 
     useDevAuth("1.2.1")
-    useMixinExtras("0.4.1")
 
     disableRunConfigs(GameSide.SERVER)
 
@@ -52,20 +41,21 @@ toolkitLoomHelper {
 
 repositories {
     maven("https://repo.polyfrost.org/releases")
+    maven("https://repo.spongepowered.org/maven")
 }
 
 dependencies {
-    implementation("cc.polyfrost:oneconfig-1.12.2-forge:0.2.2-alpha223")
-    shade("cc.polyfrost:oneconfig-1.12.2-forge:0.2.2-alpha223")
-    include("cc.polyfrost:oneconfig-1.12.2-forge:0.2.2-alpha223")
+    // Mixin API for compiling the mixin classes. V0 OneConfig ships Mixin at runtime only,
+    // and PolyMixin (which used to supply this) was removed along with useOneConfig.
+    compileOnly("org.spongepowered:mixin:0.7.11-SNAPSHOT")
+    annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
 
-    implementation("cc.polyfrost:oneconfig-wrapper-launchwrapper:1.0.0-beta17")
-    shade("cc.polyfrost:oneconfig-wrapper-launchwrapper:1.0.0-beta17")
-    include("cc.polyfrost:oneconfig-wrapper-launchwrapper:1.0.0-beta17")
+    // OneConfig V0: compile against it only. The launchwrapper downloads/loads the real OneConfig at runtime.
+    compileOnly("cc.polyfrost:oneconfig-1.12.2-forge:0.2.2-alpha223")
 
-    implementation("org.polyfrost.oneconfig:stage0:1.1.0-alpha.46")
-    shade("org.polyfrost.oneconfig:stage0:1.1.0-alpha.46")
-    include("org.polyfrost.oneconfig:stage0:1.1.0-alpha.46")
+    // Launchwrapper tweaker: on the dev classpath (so --tweakClass resolves) and bundled into the jar.
+    implementation("cc.polyfrost:oneconfig-wrapper-launchwrapper:1.0.0-beta+")
+    include("cc.polyfrost:oneconfig-wrapper-launchwrapper:1.0.0-beta+")
 }
 
 java {

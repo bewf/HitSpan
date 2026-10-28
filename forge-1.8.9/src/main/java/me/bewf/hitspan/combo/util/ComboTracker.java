@@ -67,6 +67,15 @@ public class ComboTracker {
     private final ArrayDeque<PendingHit> pending = new ArrayDeque<>(MAX_QUEUE);
     private final HashMap<Integer, Long> lastPacketConfirmMs = new HashMap<Integer, Long>();
 
+    /** Clears all state (called when leaving a world). */
+    public void reset() {
+        pending.clear();
+        lastPacketConfirmMs.clear();
+        combo = 0;
+        lastHitTimeMs = 0;
+        lastTargetId = -1;
+    }
+
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
