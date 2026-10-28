@@ -54,6 +54,7 @@ public final class UpdateChecker {
                     Minecraft.getMinecraft().player.sendMessage(
                             buildMessage(projectSlug, displayName, latest, currentVersion)
                     );
+                    NotificationManager.showUpdateNotificationWithConfigTip();
                 });
 
                 System.out.println("[" + displayName + "] Update check: " + latest + " available (current " + currentVersion + ")");

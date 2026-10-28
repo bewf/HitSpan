@@ -42,6 +42,14 @@ public class RangeTracker {
     private final ArrayDeque<PendingHit> pending = new ArrayDeque<>(MAX_QUEUE);
     private final HashMap<Integer, Long> lastPacketConfirmMs = new HashMap<>();
 
+    /** Clears all state (called when leaving a world). */
+    public void reset() {
+        pending.clear();
+        lastPacketConfirmMs.clear();
+        lastRange = -1;
+        lastRangeTimeMs = 0;
+    }
+
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END || mc.world == null) return;

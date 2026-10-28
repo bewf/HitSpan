@@ -14,6 +14,7 @@ import cc.polyfrost.oneconfig.config.data.ModType;
 import me.bewf.hitspan.Knockback.hud.KnockbackHud;
 import me.bewf.hitspan.Range.hud.RangeHud;
 import me.bewf.hitspan.cps.hud.CpsHud;
+import me.bewf.hitspan.combo.hud.ComboHud;
 
 public class HitSpanConfig extends Config {
 
@@ -169,6 +170,54 @@ public class HitSpanConfig extends Config {
     )
     public boolean knockbackPlayersOnly = true;
 
+
+    // =============================
+    // Combo
+    // =============================
+
+    @HUD(
+            name = "Combo HUD",
+            category = "Combo",
+            subcategory = "HUD"
+    )
+    public final ComboHud comboHud = new ComboHud();
+
+    public boolean comboHudEnabled = true;
+
+    @Number(
+            name = "Hide Under",
+            description = "Hide the Combo HUD when combo is under this value. Set to 0 to always show.",
+            min = 0, max = 100,
+            category = "Combo",
+            subcategory = "General"
+    )
+    public int comboHideUnder = 3;
+
+    @Text(
+            name = "Label",
+            description = "Text shown before the combo value (example: \"Combo: \")",
+            category = "Combo",
+            subcategory = "General"
+    )
+    public String comboLabel = "Combo: ";
+
+    @Checkbox(
+            name = "Players Only",
+            description = "Only count combos on players",
+            category = "Combo",
+            subcategory = "General"
+    )
+    public boolean comboPlayersOnly = true;
+
+    @Number(
+            name = "Reset Time (seconds)",
+            description = "Time before combo resets to 0. Set to 0 to disable auto-reset.",
+            min = 0, max = 60,
+            category = "Combo",
+            subcategory = "General"
+    )
+    public int comboResetTimeSeconds = 5;
+
     // =============================
     // CPS
     // =============================
@@ -188,7 +237,7 @@ public class HitSpanConfig extends Config {
             category = "CPS",
             subcategory = "General"
     )
-    public boolean cpsHideOnZero = false;
+    public boolean cpsHideOnZero = true;
 
     @Text(
             name = "Label",
@@ -283,6 +332,17 @@ public class HitSpanConfig extends Config {
             subcategory = "General"
     )
     public boolean debugServerAttackerInfo = false;
+
+    @Checkbox(
+            name = "Update Checker",
+            description = "Show update notification when joining the game.",
+            category = "Debug",
+            subcategory = "Updates"
+    )
+    public boolean updateCheckerEnabled = true;
+
+    // Internal flag to track if config tip has been shown (hidden from UI)
+    public boolean hasShownConfigTip = false;
 
     private HitSpanConfig() {
         super(

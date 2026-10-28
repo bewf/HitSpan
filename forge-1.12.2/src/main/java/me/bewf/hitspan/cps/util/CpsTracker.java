@@ -28,6 +28,17 @@ public class CpsTracker {
 
     private static long lastSampleTimeMs = 0L;
 
+    /** Clears all state (called when leaving a world). */
+    public static void reset() {
+        leftClicks.clear();
+        rightClicks.clear();
+        leftSamples.clear();
+        rightSamples.clear();
+        leftPressed = false;
+        rightPressed = false;
+        lastSampleTimeMs = 0L;
+    }
+
     @SubscribeEvent
     public void onMouse(MouseEvent e) {
         recordEdges();

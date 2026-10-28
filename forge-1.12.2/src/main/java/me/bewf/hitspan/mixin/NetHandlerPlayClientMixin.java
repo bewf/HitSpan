@@ -1,6 +1,7 @@
 package me.bewf.hitspan.mixin;
 
 import me.bewf.hitspan.Range.util.RangeTracker;
+import me.bewf.hitspan.combo.util.ComboTracker;
 import me.bewf.hitspan.config.HitSpanConfig;
 import me.bewf.hitspan.debug.HitSpanDebug;
 import net.minecraft.client.Minecraft;
@@ -30,8 +31,20 @@ public class NetHandlerPlayClientMixin {
             HitSpanDebug.chat("SPacket opcode=2 ent=" + e.getEntityId());
         }
 
+        // Local player was hurt: reset combo and don't treat it as one of our hits
+        if (mc.player != null && e.getEntityId() == mc.player.getEntityId()) {
+            if (ComboTracker.INSTANCE != null) {
+                ComboTracker.INSTANCE.onPlayerHurt();
+            }
+            return;
+        }
+
         if (RangeTracker.INSTANCE != null) {
             RangeTracker.INSTANCE.confirmFromHurtPacket(e.getEntityId());
+        }
+
+        if (ComboTracker.INSTANCE != null) {
+            ComboTracker.INSTANCE.confirmFromHurtPacket(e.getEntityId());
         }
     }
 }

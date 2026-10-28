@@ -11,7 +11,7 @@ import java.util.Locale;
 public class CpsHud extends TextHud {
 
     public CpsHud() {
-        super(true);
+        super(true, 20, 80); // staggered default position
     }
 
     @Override

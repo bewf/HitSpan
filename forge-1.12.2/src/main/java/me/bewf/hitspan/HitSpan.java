@@ -4,8 +4,10 @@ package me.bewf.hitspan;
 import me.bewf.hitspan.Knockback.util.KnockbackTracker;
 import me.bewf.hitspan.Range.util.RangeTracker;
 import me.bewf.hitspan.config.HitSpanConfig;
+import me.bewf.hitspan.commands.HitSpanCommand;
 import me.bewf.hitspan.cps.util.CpsTracker;
 import me.bewf.hitspan.util.UpdateCheckListener;
+import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -49,6 +51,11 @@ public class HitSpan {
         MinecraftForge.EVENT_BUS.register(new KnockbackTracker());
         MinecraftForge.EVENT_BUS.register(new CpsTracker());
         MinecraftForge.EVENT_BUS.register(new UpdateCheckListener());
+        MinecraftForge.EVENT_BUS.register(new me.bewf.hitspan.util.WorldLeaveListener());
+        MinecraftForge.EVENT_BUS.register(new me.bewf.hitspan.combo.util.ComboTracker());
+
+        // Register client command
+        ClientCommandHandler.instance.registerCommand(new HitSpanCommand());
 
         System.out.println("HitSpan loaded - bewf on top");
     }
