@@ -39,6 +39,8 @@ abstract class HitSpanTextHud(id: String, title: String, defaultLabel: String) :
 
     override fun getText(): String? = null
 
+    override fun showByDefault(): Boolean = false
+
     override fun update(): Boolean {
         val example = HudManager.isEditing || !isReal
         val shown = try {

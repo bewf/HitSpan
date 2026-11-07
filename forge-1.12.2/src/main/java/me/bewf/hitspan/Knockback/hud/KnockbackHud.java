@@ -13,7 +13,7 @@ public class KnockbackHud extends TextHud {
     private static final transient DecimalFormat DF = new DecimalFormat("0.00");
 
     public KnockbackHud() {
-        super(true, 20, 40); // staggered default position
+        super(false, 20, 40); // staggered default position
     }
 
     @Override

@@ -10,7 +10,7 @@ import java.util.List;
 public class ComboHud extends TextHud {
 
     public ComboHud() {
-        super(true, 20, 60); // staggered default position
+        super(false, 20, 60); // staggered default position
     }
 
     @Override
